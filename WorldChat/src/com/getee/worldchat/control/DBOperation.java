@@ -17,9 +17,13 @@ public class DBOperation {
      * 对用户的基本信息进行 验证，保存，或修改
      * @return
      */
-    public static void main(String[] args) {
-        User admin=new User();
-    }
+    /*public static void main(String[] args) {
+        //User admin=new User("266","166","666","666","666");
+        User admin=DBOperation.select("266");
+        //DBOperation.creat(admin);
+        System.out.println(DBOperation.addFriend(admin, "166", "r厦"));
+        
+    }*/
     public static User login(String idNum,String password)//验证登录
     {
 //        File file=new File("userinfo/"+idNum+".wc");
@@ -62,14 +66,22 @@ public class DBOperation {
     }
     public static User addFriend(User user,String addID,String groupName)//添加好友信息(自己类，添加的好友id,分组名)
     {
-        Map<String,String> friend=user.getFriends();
-        friend.put(addID, groupName);
-        user.setFriends(friend);
-        return user;
+        //Map<String,String> friend=user.getFriends();
+        //friend.put(addID, groupName);
+        user.getFriends().put(addID, groupName);
+        //user.setFriends(friend);
+        for( String t:user.getFriends().values())
+        {
+            System.out.println(t);
+        }
+        if(edit(user))//将信息保存进文件
+            return user;
+        else
+            return null;
         
     }
 
-    public static boolean add(User user)//添加注册信息=======在界面出进行new HashMap==
+    public static boolean creat(User user)//添加注册信息=======在界面出进行new HashMap==
     {
         File file=new File("userinfo/"+user.getIdNum()+".wc");
         if(file.exists()) return false;

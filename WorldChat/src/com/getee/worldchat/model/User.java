@@ -65,6 +65,12 @@ public class User implements Serializable {
     public void setFriends(Map<String, String> friends) {
         this.friends = friends;
     }
+    @Override
+    public String toString() {
+        return "User [idNum=" + idNum + ", password=" + password + ", niname="
+                + niname + ", sex=" + sex + ", speakword=" + speakword
+                + ", friends=" + friends + "]";
+    }
     
 
 }
