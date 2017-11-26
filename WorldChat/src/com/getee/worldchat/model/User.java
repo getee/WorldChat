@@ -14,6 +14,7 @@ public class User implements Serializable {
     private String niname;//昵称
     private String sex;//性别
     private String speakword;//个性签名
+    private String photo;//头像路径
     private Map<String,String> friends;//列表:<好友账号,分组名>
     
     public User(String idNum, String password, String niname, String sex,

@@ -14,6 +14,7 @@ import com.getee.worldchat.model.User;
 
 public class DBOperation {
     /**
+     * 由服务器类调用
      * 对用户的基本信息进行 验证，保存，或修改
      * @return
      */
