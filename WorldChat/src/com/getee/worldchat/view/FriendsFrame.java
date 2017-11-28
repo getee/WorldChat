@@ -1,5 +1,6 @@
-package com.getee.worldchat.frame;
+package com.getee.worldchat.view;
 
+import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.Image;
 
@@ -8,6 +9,11 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import java.awt.Color;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
@@ -16,7 +22,11 @@ import javax.swing.JComboBox;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 import javax.swing.JButton;
+
+import com.getee.worldchat.model.PictureBath;
+
 
 public class FriendsFrame extends JFrame{
     private JTextField textField;
@@ -28,7 +38,8 @@ public class FriendsFrame extends JFrame{
     public static void main(String[] args) {
         new FriendsFrame();
     }
-    public FriendsFrame() {      
+    public FriendsFrame() {
+        this.setIconImage(PictureBath.ICON.getImage());//设置图标
         this.setBounds(100, 100, 354, 739);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setVisible(true);
@@ -79,8 +90,48 @@ public class FriendsFrame extends JFrame{
         getContentPane().add(scrollPane);
         
         
+        DefaultMutableTreeNode  root=new DefaultMutableTreeNode("root");//定义一个jtree根节点，所有的好友分组和好友都在这个根节点上往上放
+        
+//        Map<String, HashSet<User>>  allFriends=user.getFriends();
+//         
+//        Set<String>  allGroupNames=allFriends.keySet();//获取所有的分组名
+//        
+//        for(String groupName:allGroupNames) {
+//            DefaultMutableTreeNode  group=new DefaultMutableTreeNode(groupName);//构造出每个组名的对应的TreeNode对象
+//            HashSet<User>  friendsOfGroup=allFriends.get(groupName);
+//            for(User u:friendsOfGroup) {
+//                DefaultMutableTreeNode  friend=new DefaultMutableTreeNode(u.getNickname());
+//                group.add(friend);
+//            }
+//            
+//            root.add(group);
+//        }
+
+//        tree = new JTree(root);//事件
+//        tree.addMouseListener(new MouseAdapter() {
+//            @Override
+//            public void mouseClicked(MouseEvent e) {
+//                if(e.getButton()==1&&e.getClickCount()==2) {
+//                    TreePath  path=tree.getSelectionPath();
+//                    DefaultMutableTreeNode lastNode=(DefaultMutableTreeNode)path.getLastPathComponent();
+//                    if(lastNode.isLeaf()) {
+//                        //上面是解析用户双击之后判断是不是双击的某一个用户名上的这个Node
+//                        String username=lastNode.toString();
+//                        System.out.println(username);
+//                        ChatFrame   chat=new ChatFrame();
+//                        chat.setVisible(true);
+//                    }
+//                }
+//            }
+//        });
+//        tree.setRootVisible(false);
+//        scrollPane= new JScrollPane(tree);
+//        panel.add(scrollPane, BorderLayout.CENTER);
+        
+        
         DefaultMutableTreeNode  crowdRoot=new DefaultMutableTreeNode("我的群");
-        tree = new JTree();
+        tree = new JTree(crowdRoot);
+        
         scrollPane.setViewportView(tree);
     }
 }

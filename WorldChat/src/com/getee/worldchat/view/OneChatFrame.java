@@ -1,4 +1,4 @@
-package com.getee.worldchat.frame;
+package com.getee.worldchat.view;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
@@ -17,10 +17,11 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.JLabel;
 
-import java.awt.Color;
-import javax.swing.JList;
+import com.getee.worldchat.model.PictureBath;
 
-public class CrowdFrame extends JFrame {
+import java.awt.Color;
+
+public class OneChatFrame extends JFrame {
 
     private JPanel contentPane;
     private JTextPane textPane;//对话框
@@ -32,16 +33,15 @@ public class CrowdFrame extends JFrame {
     private JButton sendButton;
     private JButton shotButton;
     private JButton voiceButton;
-    private JScrollPane scrollPane_2;
-    private JList list;
 
 
     public static void main(String[] args) {
-        new CrowdFrame();
+        new OneChatFrame();
     }
 
-    public CrowdFrame() {
+    public OneChatFrame() {
         setTitle("与XX聊天ing");
+        this.setIconImage(PictureBath.ICON.getImage());//设置图标
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 971, 691);
         contentPane = new JPanel();
@@ -51,7 +51,7 @@ public class CrowdFrame extends JFrame {
         contentPane.setLayout(null);
         
         JScrollPane scrollPane = new JScrollPane();
-        scrollPane.setBounds(0, 0, 683, 330);
+        scrollPane.setBounds(0, 0, 774, 330);
         contentPane.add(scrollPane);
         
         textPane = new JTextPane();
@@ -59,7 +59,7 @@ public class CrowdFrame extends JFrame {
         scrollPane.setViewportView(textPane);
         
         JPanel panel = new JPanel();
-        panel.setBounds(0, 329, 683, 56);
+        panel.setBounds(0, 329, 949, 56);
         contentPane.add(panel);
         panel.setLayout(null);
         
@@ -75,7 +75,7 @@ public class CrowdFrame extends JFrame {
         emojiButton.setBounds(62, 0, 64, 55);
         panel.add(emojiButton);
         
-        ImageIcon three = new ImageIcon("source/icon/f.png");//上传图标
+        ImageIcon three = new ImageIcon("source/icon/c.png");//抖动图标
         three.setImage(three.getImage().getScaledInstance(64,55,Image.SCALE_DEFAULT));
         quakeButton = new JButton(three);
         quakeButton.setBounds(124, 0, 64, 55);
@@ -94,7 +94,7 @@ public class CrowdFrame extends JFrame {
         panel.add(shotButton);
         
         JScrollPane scrollPane_1 = new JScrollPane();
-        scrollPane_1.setBounds(0, 384, 683, 196);
+        scrollPane_1.setBounds(0, 384, 774, 196);
         contentPane.add(scrollPane_1);
         
         textPane_1 = new JTextPane();
@@ -103,7 +103,7 @@ public class CrowdFrame extends JFrame {
         
         closeButton = new JButton("关闭");
         closeButton.setBackground(Color.GRAY);
-        closeButton.setBounds(375, 586, 146, 34);
+        closeButton.setBounds(466, 589, 146, 34);
         contentPane.add(closeButton);
         
         sendButton = new JButton("发送");
@@ -112,18 +112,15 @@ public class CrowdFrame extends JFrame {
             public void actionPerformed(ActionEvent e) {
             }
         });
-        sendButton.setBounds(537, 587, 146, 32);
+        sendButton.setBounds(628, 590, 146, 32);
         contentPane.add(sendButton);
         
-        JLabel lblNewLabel = new JLabel("广告区招租");
-        lblNewLabel.setBounds(685, 0, 264, 170);
+        JLabel lblNewLabel = new JLabel("对方头像");
+        lblNewLabel.setBounds(774, 0, 175, 330);
         contentPane.add(lblNewLabel);
         
-        scrollPane_2 = new JScrollPane();
-        scrollPane_2.setBounds(685, 252, 264, 368);
-        contentPane.add(scrollPane_2);
-        
-        list = new JList();
-        scrollPane_2.setViewportView(list);
+        JLabel lblNewLabel_1 = new JLabel("自己头像");
+        lblNewLabel_1.setBounds(774, 384, 175, 239);
+        contentPane.add(lblNewLabel_1);
     }
 }

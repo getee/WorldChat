@@ -1,9 +1,11 @@
-package com.getee.worldchat.frame;
+package com.getee.worldchat.view;
 
 import java.awt.EventQueue;
 import java.awt.Frame;
+import java.awt.Image;
 
 import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -17,22 +19,31 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import javax.swing.JPasswordField;
 
+import com.getee.worldchat.model.PictureBath;
+import com.getee.worldchat.model.User;
+
 
 public class RegistFrame extends JFrame{
-    private JTextField textField;//用户名
-    private JTextField textField_1;//昵称
-    private JRadioButton menButton ;//男按钮
+    private JTextField textField;//用户名*
+    private JTextField textField_1;//昵称*
+    private JRadioButton menButton ;//男按钮*
     private JRadioButton womenButton;//女按钮
     private JComboBox comboBox;//下拉头像
     private JCheckBox chckbxNewCheckBox;//已阅读条款
     private JButton button;//完成注册按钮
-    private JPasswordField passwordField;
+    private JPasswordField passwordField;//密码*
     private JPasswordField passwordField_1;
+    private ImageIcon headImg;//头像图片
+    private String headImgBath;//头像图片路径*
+    private String sex;//性别*
+    //private ObjectReaderStream ors;
     
 
     public static void main(String[] args) {
@@ -44,6 +55,7 @@ public class RegistFrame extends JFrame{
      */
     public RegistFrame() {
         setTitle("注册账号");
+        this.setIconImage(PictureBath.ICON.getImage());//设置图标
         this.setBounds(100, 100, 739, 625);
         this.setVisible(true);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -87,25 +99,55 @@ public class RegistFrame extends JFrame{
         label_2.setBounds(254, 272, 63, 36);
         getContentPane().add(label_2);
         
+        sex="男";
         menButton = new JRadioButton("男",true);
         menButton.setBounds(325, 276, 63, 29);
         getContentPane().add(menButton);
+        menButton.addActionListener((ActionEvent e)->{
+            sex="男";
+        });
         
         womenButton = new JRadioButton("女");
         womenButton.setBounds(395, 276, 63, 29);
         getContentPane().add(womenButton);
+        womenButton.addActionListener((ActionEvent e)->{
+            sex="女";
+        });
         
         ButtonGroup buGroup = new ButtonGroup();//使按键之间添加单选按钮组
         buGroup.add(menButton);
         buGroup.add(womenButton);
         
+        headImg = new ImageIcon("source/头像1.jpg");//大头像处
+        headImgBath="source/头像1.jpg";
+        headImg.setImage(headImg.getImage().getScaledInstance(208,260,Image.SCALE_DEFAULT));
+        JLabel label_3 = new JLabel(headImg);
+        label_3.setBounds(15, 48, 208, 260);
+        getContentPane().add(label_3);
 
-        comboBox = new JComboBox();//头像下拉列表
+        comboBox = new JComboBox(PictureBath.PHOTO);//头像下拉列表
 //        comboBox.setToolTipText("");
         comboBox.setBounds(325, 316, 231, 36);
         getContentPane().add(comboBox);
+
+        comboBox.addItemListener(new ItemListener(){
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if(e.getStateChange()==ItemEvent.SELECTED)
+                {
+                    String str=(String)comboBox.getSelectedItem();
+                    headImgBath="source/"+str+".jpg";
+                    headImg = new ImageIcon(headImgBath);
+                    label_3.setIcon(headImg);
+                    
+                }
+                
+            }
+
+        });
         
-        JLabel lblNewLabel_2 = new JLabel("头  像");
+       
+        JLabel lblNewLabel_2 = new JLabel("头像");
         lblNewLabel_2.setBounds(254, 323, 56, 36);
         getContentPane().add(lblNewLabel_2);
         
@@ -122,6 +164,10 @@ public class RegistFrame extends JFrame{
             {
                 JOptionPane.showMessageDialog(RegistFrame.this, "用户名一旦注册无法更改!","相关条款",JOptionPane.INFORMATION_MESSAGE);
             }
+            else
+            {
+                sendRegist();
+            }
         });
 //        button.addActionListener(new ActionListener(){
 //            @Override
@@ -133,13 +179,7 @@ public class RegistFrame extends JFrame{
 //                }
 //            } 
 //        });
-        
-        
-        JLabel label_3 = new JLabel("头像");
-        label_3.setBounds(15, 48, 208, 260);
-        getContentPane().add(label_3);
-        
-        
+
         passwordField = new JPasswordField();
         passwordField.setBounds(325, 152, 231, 31);
         getContentPane().add(passwordField);
@@ -189,8 +229,14 @@ public class RegistFrame extends JFrame{
         
         
     }
-    public void sendRegist()
+    public void sendRegist()//把注册窗口显示出来，再自动填装用户名
     {
-        
+        User user=new User();
+        user.setIdNum(textField.getText().toString().trim());
+        user.setNiname(textField_1.getText().toString().trim());
+        user.setPassword(String.valueOf(passwordField.getPassword()));
+        user.setSex(sex);
+        user.setPhoto(headImgBath);
+        System.out.println(user);
     }
 }

@@ -1,4 +1,4 @@
-package com.getee.worldchat.frame;
+package com.getee.worldchat.view;
 
 import java.awt.EventQueue;
 import java.awt.Image;
@@ -12,6 +12,8 @@ import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import javax.swing.JButton;
 
+import com.getee.worldchat.model.PictureBath;
+
 public class LoginFrame extends JFrame {
     private JTextField textField;
     private JPasswordField passwordField;
@@ -24,12 +26,13 @@ public class LoginFrame extends JFrame {
     }
     public LoginFrame(){
         setTitle("WorldChat");
+        this.setIconImage(PictureBath.ICON.getImage());//设置图标
         this.setBounds(100, 100, 567, 465);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setVisible(true);
         getContentPane().setLayout(null);
         
-        ImageIcon title = new ImageIcon("source/fun2.gif");
+        ImageIcon title = new ImageIcon("source/start.png");
         title.setImage(title.getImage().getScaledInstance(545,186,Image.SCALE_DEFAULT));
         JLabel lblNewLabel = new JLabel(title);
         lblNewLabel.setBounds(0, 0, 545, 186);

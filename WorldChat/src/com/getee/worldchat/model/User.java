@@ -30,6 +30,12 @@ public class User implements Serializable {
     {
         
     }
+    public String getPhoto() {
+        return photo;
+    }
+    public void setPhoto(String photo) {
+        this.photo = photo;
+    }
     public String getIdNum() {
         return idNum;
     }
@@ -70,7 +76,7 @@ public class User implements Serializable {
     public String toString() {
         return "User [idNum=" + idNum + ", password=" + password + ", niname="
                 + niname + ", sex=" + sex + ", speakword=" + speakword
-                + ", friends=" + friends + "]";
+                + ", photo=" + photo + ", friends=" + friends + "]";
     }
     
 
