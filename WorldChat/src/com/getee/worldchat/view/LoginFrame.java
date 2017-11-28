@@ -4,6 +4,11 @@ import java.awt.EventQueue;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+import java.net.UnknownHostException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -12,19 +17,35 @@ import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import javax.swing.JButton;
 
+import com.getee.worldchat.control.PackMessage;
+import com.getee.worldchat.model.MessHelp;
+import com.getee.worldchat.model.MessageBox;
 import com.getee.worldchat.model.PictureBath;
+import com.getee.worldchat.model.User;
+
+
 
 public class LoginFrame extends JFrame {
+    private AllButtonListener  listener;//内部类监听对象
+
     private JTextField textField;
     private JPasswordField passwordField;
     private JLabel label_1;
     private JButton button;
     private JButton button_1;
+    private Socket link;//持有链接
     
+    private ObjectOutputStream out;
+    private ObjectInputStream in;
+    
+    {
+        listener=new AllButtonListener();
+    }
     public static void main(String[] args) {
         new LoginFrame();      
     }
     public LoginFrame(){
+
         setTitle("WorldChat");
         this.setIconImage(PictureBath.ICON.getImage());//设置图标
         this.setBounds(100, 100, 567, 465);
@@ -63,22 +84,51 @@ public class LoginFrame extends JFrame {
         label_1 = new JLabel(head);
         label_1.setBounds(10, 201, 134, 145);
         getContentPane().add(label_1);
-        
+//        PackMessage pm= new PackMessage(){
+//                public MessageBox packLogin(String idNum,String password,int messType){return null;}//登录消息
+//        };
         button = new JButton("登陆");
         button.setBounds(218, 325, 101, 29);
         getContentPane().add(button);
-        button.addActionListener(new ActionListener(){
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new FriendsFrame();
-                
-            }
-            
-        });
+        button.addActionListener(listener);
         
         button_1 = new JButton("注册");
         button_1.setBounds(369, 325, 101, 29);
         getContentPane().add(button_1);
-              
+        button_1.addActionListener(listener);
+    }
+    class AllButtonListener implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent e){
+            System.out.println("client");
+              try {
+                  link=new Socket(MessHelp.IP,MessHelp.PORT);//链接
+                  out=new ObjectOutputStream(link.getOutputStream());
+                  in=new ObjectInputStream(link.getInputStream());
+              } catch (UnknownHostException e1) {
+                  // TODO Auto-generated catch block
+                  e1.printStackTrace();
+              } catch (IOException e1) {
+                  // TODO Auto-generated catch block
+                  e1.printStackTrace();
+              }
+
+            if(e.getSource()==button){
+                User user = null;//等服务器流验证
+                String idNum=textField.getText().toString().trim();
+                String password=String.valueOf(passwordField.getPassword());
+                MessageBox m=MessageBox.packLogin(idNum, password);
+                System.out.println(idNum+"-----"+password);
+                new FriendsFrame(out,in,user);
+                LoginFrame.this.setVisible(false);
+                
+                
+            }
+            else if(e.getSource()==button_1)
+            {
+                new RegistFrame(out,in,LoginFrame.this);
+                LoginFrame.this.setVisible(false); 
+            }
+        }
     }
 }

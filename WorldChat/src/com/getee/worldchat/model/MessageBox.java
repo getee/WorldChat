@@ -14,6 +14,30 @@ public class MessageBox {
         this.type = type;
         this.time = time;
     }
+    public MessageBox() {
+        
+    }
+    /*
+     * 静态方法用于直接打包产生一个MessageBox
+     */
+    public static MessageBox packLogin(String idNum,String password){
+        User user=new User();
+        user.setIdNum(idNum);
+        user.setPassword(password);
+        
+        MessageBox m=new MessageBox();
+        m.setType(MessHelp.LOGIN);
+        m.setFrom(user);
+        return m;
+        
+    }
+    public static MessageBox packRegist(User user){//注册消息
+         return null;
+    }
+    
+    public static MessageBox packTrue(User user){//注册消息
+        return null;
+   }
     @Override
     public String toString() {
         return "MessageBox [content=" + content + ", from=" + from + ", to="

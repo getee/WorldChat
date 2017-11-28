@@ -1,7 +1,7 @@
 package com.getee.worldchat.model;
 
 public interface MessHelp {
-    public String IP="172.19.22.111";
+    public String IP="172.19.22.114";
     public int PORT=8090;
             
             

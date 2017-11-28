@@ -21,8 +21,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 
 import javax.swing.JPasswordField;
 
@@ -43,13 +47,23 @@ public class RegistFrame extends JFrame{
     private ImageIcon headImg;//头像图片
     private String headImgBath;//头像图片路径*
     private String sex;//性别*
+    
+    private LoginFrame login;
+    
+    private ObjectOutputStream out;
+    private ObjectInputStream in;//链接*
     //private ObjectReaderStream ors;
     
 
     public static void main(String[] args) {
         new RegistFrame();
     }
-
+    public RegistFrame(ObjectOutputStream out,ObjectInputStream in,LoginFrame login) {
+        this();
+        this.in=in;
+        this.out=out;
+        this.login=login;
+    }
     /**
      * Create the application.
      */
@@ -167,6 +181,8 @@ public class RegistFrame extends JFrame{
             else
             {
                 sendRegist();
+                RegistFrame.this.setVisible(false);
+                RegistFrame.this.login.setVisible(true);  
             }
         });
 //        button.addActionListener(new ActionListener(){
@@ -187,19 +203,11 @@ public class RegistFrame extends JFrame{
         passwordField_1 = new JPasswordField();//密码确认框
         passwordField_1.setBounds(325, 211, 231, 31);
         getContentPane().add(passwordField_1);
-        passwordField_1.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                // TODO Auto-generated method stub
-            }
-            @Override
-            public void mousePressed(MouseEvent e) {
-                // TODO Auto-generated method stub
-            }
-            @Override
+        passwordField_1.addMouseListener(new MouseAdapter() {
             public void mouseExited(MouseEvent e) {
                 String pass=String.valueOf(passwordField.getPassword());
                 String passWord=String.valueOf(passwordField_1.getPassword());
+
                 if(!pass.equals(passWord)){
                     button.setEnabled(false);
                     label_5.setVisible(true);
@@ -211,32 +219,21 @@ public class RegistFrame extends JFrame{
                 }
                 
             }
-            
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                // TODO Auto-generated method stub
-                
-            }
-            
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                // TODO Auto-generated method stub
-                
-            }
         });
         
         //JLabel label_4 = new JLabel("用户名已注册");//使用弹窗提醒
-        
-        
+
     }
+    
     public void sendRegist()//把注册窗口显示出来，再自动填装用户名
     {
         User user=new User();
-        user.setIdNum(textField.getText().toString().trim());
-        user.setNiname(textField_1.getText().toString().trim());
+        user.setIdNum(textField.getText().trim());
+        user.setNiname(textField_1.getText().trim());
         user.setPassword(String.valueOf(passwordField.getPassword()));
         user.setSex(sex);
         user.setPhoto(headImgBath);
+        //String idNum=textField.getText().trim();
         System.out.println(user);
     }
 }

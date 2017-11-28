@@ -11,6 +11,9 @@ import javax.swing.JTextField;
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -26,6 +29,7 @@ import javax.swing.tree.TreePath;
 import javax.swing.JButton;
 
 import com.getee.worldchat.model.PictureBath;
+import com.getee.worldchat.model.User;
 
 
 public class FriendsFrame extends JFrame{
@@ -34,9 +38,19 @@ public class FriendsFrame extends JFrame{
     private JButton btnNewButton_1;
     private JButton btnNewButton_2;
     private JTree tree;
+    private User user;
+    
+    private ObjectOutputStream out;
+    private ObjectInputStream in;
     
     public static void main(String[] args) {
         new FriendsFrame();
+    }
+    public FriendsFrame(ObjectOutputStream out,ObjectInputStream in,User user) {
+        this();
+        this.in=in;
+        this.out=out;
+        this.user=user;
     }
     public FriendsFrame() {
         this.setIconImage(PictureBath.ICON.getImage());//设置图标
@@ -129,8 +143,11 @@ public class FriendsFrame extends JFrame{
 //        panel.add(scrollPane, BorderLayout.CENTER);
         
         
-        DefaultMutableTreeNode  crowdRoot=new DefaultMutableTreeNode("我的群");
-        tree = new JTree(crowdRoot);
+        DefaultMutableTreeNode  deTree_1=new DefaultMutableTreeNode("我的好友");
+        DefaultMutableTreeNode  deTree_2=new DefaultMutableTreeNode("养猪的");
+        DefaultMutableTreeNode  deTree_3=new DefaultMutableTreeNode("杀猪的");
+        DefaultMutableTreeNode  deTree_4=new DefaultMutableTreeNode("卖猪的");
+        tree = new JTree(deTree_1);
         
         scrollPane.setViewportView(tree);
     }

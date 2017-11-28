@@ -66,7 +66,14 @@ public class ServerContral {
                 }
             }
         }
+        private void disposeRegist(){
+            
+        }
+        private void disposeLogin(){
+            
+        }
+        
+        
         
     }
-
 }
