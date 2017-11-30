@@ -226,6 +226,7 @@ public class RegistFrame extends JFrame{
         user.setPassword(String.valueOf(passwordField.getPassword()));
         user.setSex(sex);
         user.setPhoto(headImgBath);
+        user.setSpeakword("贫僧是来画圆的。");
         //if(user.getIdNum().equals("")) 账户非法
         try {
             MessageBox writeMessage=PackMessage.packRegist(user);

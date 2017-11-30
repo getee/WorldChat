@@ -32,18 +32,18 @@ public class User implements Serializable {
     }
     public User(String idNum, String password, String niname, String sex,
             String speakword) {
+        this();
         this.idNum = idNum;
         this.password = password;
         this.niname = niname;
         this.sex = sex;
         this.speakword = speakword;
-        this.friends = new TreeMap<>();//好友不能直接构造
-        this.groups = new HashSet<>();//群不能直接构造
-        
+                
     }
     public User()
     {
-        
+        this.friends = new TreeMap<>();//好友不能直接构造
+        this.groups = new HashSet<>();//群不能直接构造
     }
     public String getPhoto() {
         return photo;
@@ -92,7 +92,9 @@ public class User implements Serializable {
     public Set<User> allFriendsId()//遍历出所有好友
     {
         Set<User> allF = new HashSet<>();
+        if(friends==null) return null;
         Set<String> key= friends.keySet();
+        if(key==null) return null;
         for(String n:key){
             Set<User> t=friends.get(n);//获取到一个分组中的所有好友
             for(User i:t){
@@ -104,8 +106,11 @@ public class User implements Serializable {
     @Override
     public String toString() {
         String friendsName="";
-        for(User t : allFriendsId()){
-            friendsName=friendsName+"、"+t.getIdNum();
+        Set<User> allF = allFriendsId();
+        if(allF!=null){
+            for(User t : allF){
+                friendsName=friendsName+"、"+t.getIdNum();
+            }
         }
 //        String groupsName="";
 //        for(String t : groups){

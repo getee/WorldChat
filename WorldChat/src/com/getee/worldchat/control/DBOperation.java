@@ -24,8 +24,8 @@ public class DBOperation {
 //        
 //        DBOperation.creat(admin);
 
-//        User admin=select("166");
-//        System.out.println(DBOperation.addFriend(admin, "266", "r厦"));
+       // User admin=select("3");
+       //out.println(DBOperation.addFriend(admin, "2", "开黑"));
 //        System.out.println(admin);
 //        System.out.println(select("266"));
         
