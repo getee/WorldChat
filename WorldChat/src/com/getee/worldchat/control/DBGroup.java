@@ -7,42 +7,26 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import com.getee.worldchat.model.User;
 
-public class DBOperation {
-    /**
+public class DBGroup {
+    /*
      * 由服务器类调用
-     * 对用户的基本信息进行 验证，保存，或修改
-     * @return
+     * 加群操作，查找，创建，把群当做一个user
      */
-    public static void main(String[] args) {
-//        User admin=new User("366","666","666","666","666");
-//        
-//        DBOperation.creat(admin);
 
-//        User admin=select("166");
-//        System.out.println(DBOperation.addFriend(admin, "266", "r厦"));
-//        System.out.println(admin);
-//        System.out.println(select("266"));
-        
-    }
-    public static User login(String idNum,String password)//验证登录
+//    public static void main(String[] args) {
+//        // TODO Auto-generated method stub
+//        
+//
+//    }
+    public static User select(String idNum)//查找账户。。。。添加群
     {
-//        File file=new File("userinfo/"+idNum+".wc");
-//        if(!file.exists())return null;
-        User user=select(idNum);//查询出账户信息
-        if(user==null)return null;
-        if(user.getPassword().equals(password))return user;//返回登录的用户所有信息
-        return null;
-        
-    }
-    public static User select(String idNum)//查找账户。。。。添加好友
-    {
-        File file=new File("userinfo/"+idNum+".wc");
+        File file=new File("groupinfo/"+idNum+".wcg");//群信息后缀不同
         if(!file.exists())return null;
         
         ObjectInputStream obj = null;
@@ -70,39 +54,41 @@ public class DBOperation {
         }
         return null;
     }
-    public static boolean addFriend(User user,String addID,String callName)//添加好友信息(自己类，添加的好友id,分组名)
+    /*
+     * 显示出群中的所有人数
+     */
+    
+    /*
+     * 用户要加群时调用
+     */
+    public static boolean addGroup(User user,String addID)//添加群信息(自己类，添加的群id,分组名)
     {
 
-        User friend=select(addID);//查找该好友
-        if(friend==null) return false;//不存在该好友
-        Map<String,HashSet<User>> itm=user.getFriends();
-        HashSet<User> its=itm.get(callName);//取出该小组中的所有成员集合
-        if(its==null){
-            its=new HashSet<>();
+        User group=select(addID);//查找该群
+        if(group==null) return false;//不存在该群
+        Set<String> its=user.getGroups();
+        its.add(addID);
+        if(DBOperation.edit(user))return false;        //保存用户添加的群
+
+        String level="nomal";
+        Map<String,HashSet<User>> gm=group.getFriends();//取出该群中的所有成员集合
+        HashSet<User> gs=gm.get(level);//取出该小组中的所有成员集合
+        if(gs==null){
+            gs=new HashSet<>();
         }
-        its.add(friend);
-        itm.put(callName, its);
+        gs.add(user);
+        gm.put(level, gs);
         
-        user.setFriends(itm);//自己信息修改
-        if(!edit(user)) return false;
-        
-        Map<String,HashSet<User>> fm=friend.getFriends();
-        HashSet<User> fs=fm.get(callName);//取出该小组中的所有成员集合
-        if(fs==null){
-            fs=new HashSet<>();
-        }
-        fs.add(user);
-        fm.put(callName, fs);
-        
-        friend.setFriends(fm);
-        if(!edit(friend)) return false;
+        group.setFriends(gm);
+
+        if(!edit(group)) return false;//保存对对群的修改
         return true;
         
     }
 
     public static boolean creat(User user)//添加注册信息=======在界面出进行new HashMap==
     {
-        File file=new File("userinfo/"+user.getIdNum()+".wc");
+        File file=new File("groupinfo/"+user.getIdNum()+".wcg");
         if(file.exists()) return false;
         else{
             try {
@@ -114,13 +100,9 @@ public class DBOperation {
         }
         return edit(user);
     }
-    
-    /*
-     * 修改信息----需要在修改界面处判断修改后的id是否被注册(或阻止ID修改)----
-     */
-    public static boolean edit(User user)//可做保存数据用途
+    public static boolean edit(User user)//修改信息----需要在修改界面处判断修改后的id是否被注册(或阻止ID修改)----
     {
-        File file=new File("userinfo/"+user.getIdNum()+".wc");
+        File file=new File("groupinfo/"+user.getIdNum()+".wcg");
         ObjectOutputStream obj = null;
         try {
             obj=new ObjectOutputStream(new FileOutputStream(file));
@@ -149,4 +131,5 @@ public class DBOperation {
     }
     //public static boolean delete(User user)//账号不删除
     
+
 }

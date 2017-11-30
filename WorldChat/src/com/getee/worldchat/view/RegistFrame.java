@@ -24,12 +24,16 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 import javax.swing.JPasswordField;
 
+import com.getee.worldchat.control.PackMessage;
+import com.getee.worldchat.model.MessHelp;
+import com.getee.worldchat.model.MessageBox;
 import com.getee.worldchat.model.PictureBath;
 import com.getee.worldchat.model.User;
 
@@ -63,6 +67,7 @@ public class RegistFrame extends JFrame{
         this.in=in;
         this.out=out;
         this.login=login;
+        this.sex="男";
     }
     /**
      * Create the application.
@@ -113,7 +118,7 @@ public class RegistFrame extends JFrame{
         label_2.setBounds(254, 272, 63, 36);
         getContentPane().add(label_2);
         
-        sex="男";
+        
         menButton = new JRadioButton("男",true);
         menButton.setBounds(325, 276, 63, 29);
         getContentPane().add(menButton);
@@ -139,7 +144,7 @@ public class RegistFrame extends JFrame{
         label_3.setBounds(15, 48, 208, 260);
         getContentPane().add(label_3);
 
-        comboBox = new JComboBox(PictureBath.PHOTO);//头像下拉列表
+        comboBox = new JComboBox(PictureBath.PHOTO);//头像下拉列表,以及添加头像名
 //        comboBox.setToolTipText("");
         comboBox.setBounds(325, 316, 231, 36);
         getContentPane().add(comboBox);
@@ -181,20 +186,8 @@ public class RegistFrame extends JFrame{
             else
             {
                 sendRegist();
-                RegistFrame.this.setVisible(false);
-                RegistFrame.this.login.setVisible(true);  
             }
         });
-//        button.addActionListener(new ActionListener(){
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                if(!chckbxNewCheckBox.isSelected())
-//                {
-//                    System.out.println("ddd");
-//                    JOptionPane.showMessageDialog(RegistFrame.this, "用户名长度不够!","温馨提示",JOptionPane.ERROR_MESSAGE);
-//                }
-//            } 
-//        });
 
         passwordField = new JPasswordField();
         passwordField.setBounds(325, 152, 231, 31);
@@ -233,7 +226,37 @@ public class RegistFrame extends JFrame{
         user.setPassword(String.valueOf(passwordField.getPassword()));
         user.setSex(sex);
         user.setPhoto(headImgBath);
+        //if(user.getIdNum().equals("")) 账户非法
+        try {
+            MessageBox writeMessage=PackMessage.packRegist(user);
+            out.writeObject(writeMessage);
+            out.flush();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
+        try {
+            MessageBox readMessage=(MessageBox)in.readObject();
+            int type=readMessage.getType();
+            if(type==MessHelp.ISFALSE)
+            {
+                JOptionPane.showMessageDialog(this, "用户名已存在!","温馨提示",JOptionPane.ERROR_MESSAGE);
+            }
+            else
+            {
+                this.setVisible(false);
+                this.login.setVisible(true);
+                login.getTextField().setText(user.getIdNum());
+            }
+        } catch (ClassNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         //String idNum=textField.getText().trim();
-        System.out.println(user);
+        //System.out.println(user);
     }
 }

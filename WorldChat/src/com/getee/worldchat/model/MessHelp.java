@@ -1,7 +1,7 @@
 package com.getee.worldchat.model;
 
 public interface MessHelp {
-    public String IP="172.19.22.114";
+    public String IP="localhost";//"172.19.22.114"
     public int PORT=8090;
             
             
@@ -14,6 +14,7 @@ public interface MessHelp {
     public int UPDATE=6;//更新信息
     
     
-    public int ISTRUE=9;//返回客户机，用于客户端确认操作是否成功
+    public int ISTRUE=8;//返回客户机，用于客户端确认操作是否成功
+    public int ISFALSE=9;//返回客户机，提示操作失败
 
 }

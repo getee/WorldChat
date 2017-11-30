@@ -18,10 +18,14 @@ import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
 
 import com.getee.worldchat.model.PictureBath;
+import com.getee.worldchat.model.User;
 
 import java.awt.Color;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 public class OneChatFrame extends JFrame {
+    private JFrame FriendsFrame;
 
     private JPanel contentPane;
     private JTextPane textPane;//对话框
@@ -33,11 +37,32 @@ public class OneChatFrame extends JFrame {
     private JButton sendButton;
     private JButton shotButton;
     private JButton voiceButton;
+    
+    private User myself;//自身的对象
+    private User chatUser;//聊天的对象
 
+    private ObjectOutputStream out;
+    private ObjectInputStream in;
+    
 
     public static void main(String[] args) {
         new OneChatFrame();
     }
+    
+    public OneChatFrame(ObjectOutputStream out,ObjectInputStream in,JFrame FriendsFrame,User myself,User chatUser) {
+        this(myself,chatUser);
+        this.in=in;
+        this.out=out;
+        this.FriendsFrame=FriendsFrame;
+    }
+    public OneChatFrame(User myself,User chatUser) {
+        this();
+        this.myself=myself;
+        this.chatUser=chatUser;
+        setTitle("与"+chatUser.getNiname()+"聊天ing");
+    }
+
+
 
     public OneChatFrame() {
         setTitle("与XX聊天ing");

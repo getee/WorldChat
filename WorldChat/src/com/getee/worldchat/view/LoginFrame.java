@@ -2,6 +2,7 @@ package com.getee.worldchat.view;
 
 import java.awt.EventQueue;
 import java.awt.Image;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -13,15 +14,18 @@ import java.net.UnknownHostException;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import javax.swing.JButton;
+import javax.swing.SwingUtilities;
 
 import com.getee.worldchat.control.PackMessage;
 import com.getee.worldchat.model.MessHelp;
 import com.getee.worldchat.model.MessageBox;
 import com.getee.worldchat.model.PictureBath;
 import com.getee.worldchat.model.User;
+
 
 
 
@@ -42,7 +46,15 @@ public class LoginFrame extends JFrame {
         listener=new AllButtonListener();
     }
     public static void main(String[] args) {
-        new LoginFrame();      
+        //JFrame.setDefaultLookAndFeelDecorated(true);   
+        SwingUtilities.invokeLater(new Runnable() {   
+            public void run() {   
+                new LoginFrame(); 
+                //要使窗口透明，您可以使用 AWTUtilities.setWindowOpacity(Window, float) 方法   
+                //AWTUtilities.setWindowOpacity(this, 0.9f);   
+            }   
+        }); 
+       // new LoginFrame();      
     }
     public LoginFrame(){
 
@@ -97,10 +109,16 @@ public class LoginFrame extends JFrame {
         getContentPane().add(button_1);
         button_1.addActionListener(listener);
     }
+    public JTextField getTextField() {//用于自动填充账户名
+        return textField;
+    }
+    public void setTextField(JTextField textField) {
+        this.textField = textField;
+    }
     class AllButtonListener implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent e){
-            System.out.println("client");
+
               try {
                   link=new Socket(MessHelp.IP,MessHelp.PORT);//链接
                   out=new ObjectOutputStream(link.getOutputStream());
@@ -115,14 +133,38 @@ public class LoginFrame extends JFrame {
 
             if(e.getSource()==button){
                 User user = null;//等服务器流验证
-                String idNum=textField.getText().toString().trim();
-                String password=String.valueOf(passwordField.getPassword());
-                MessageBox m=MessageBox.packLogin(idNum, password);
-                System.out.println(idNum+"-----"+password);
-                new FriendsFrame(out,in,user);
-                LoginFrame.this.setVisible(false);
+                try {
+                    String idNum=textField.getText().trim();
+                    String password=String.valueOf(passwordField.getPassword());
+                    MessageBox writeMessage=PackMessage.packLogin(idNum, password);
+                    out.writeObject(writeMessage);//将登录数据传递到服务器
+                    out.flush();
+                } catch (IOException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
                 
-                
+                try {
+                    MessageBox readMessage=(MessageBox)in.readObject();//从服务器读取的 包
+                    int type=readMessage.getType();
+                    if(type==MessHelp.ISFALSE)
+                    {
+                        JOptionPane.showMessageDialog(LoginFrame.this, "用户名或密码错误!","温馨提示",JOptionPane.ERROR_MESSAGE);
+                    }
+                    else
+                    {
+                        user=readMessage.getTo();
+                        new FriendsFrame(out,in,user);
+                        LoginFrame.this.setVisible(false);
+                    }
+                } catch (ClassNotFoundException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                } catch (IOException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+
             }
             else if(e.getSource()==button_1)
             {

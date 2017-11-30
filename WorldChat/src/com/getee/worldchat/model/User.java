@@ -1,22 +1,35 @@
 package com.getee.worldchat.model;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 public class User implements Serializable {
     /**
-     * 存储用户的基本信息
+     * 存储用户的基本信息,#代表群不需要的信息
      */
     private String idNum;//账号名
-    private String password;//密码
+    private String password;//密码    #(或是验证消息)
     private String niname;//昵称
-    private String sex;//性别
+    private String sex;//性别         #
     private String speakword;//个性签名
     private String photo;//头像路径
-    private Map<String,String> friends;//列表:<好友账号,分组名>
+    private Map<String,HashSet<User>> friends;//列表:<分组名,分组中好友>
+            //# <群管理，成员>
     
+    private Set<String> groups;//群聊列表:<群id名>仅当在群聊中说话时启动查看,添加了哪些群
+    
+
+    public Set<String> getGroups() {//差一个toString
+        return groups;
+    }
+    public void setGroups(Set<String> groups) {
+        this.groups = groups;
+    }
     public User(String idNum, String password, String niname, String sex,
             String speakword) {
         this.idNum = idNum;
@@ -25,6 +38,8 @@ public class User implements Serializable {
         this.sex = sex;
         this.speakword = speakword;
         this.friends = new TreeMap<>();//好友不能直接构造
+        this.groups = new HashSet<>();//群不能直接构造
+        
     }
     public User()
     {
@@ -66,18 +81,42 @@ public class User implements Serializable {
     public void setSpeakword(String speakword) {
         this.speakword = speakword;
     }
-    public Map<String, String> getFriends() {
+
+    public Map<String, HashSet<User>> getFriends() {
         return friends;
     }
-    public void setFriends(Map<String, String> friends) {
+    public void setFriends(Map<String, HashSet<User>> friends) {
         this.friends = friends;
+    }
+    
+    public Set<User> allFriendsId()//遍历出所有好友
+    {
+        Set<User> allF = new HashSet<>();
+        Set<String> key= friends.keySet();
+        for(String n:key){
+            Set<User> t=friends.get(n);//获取到一个分组中的所有好友
+            for(User i:t){
+                allF.add(i);
+            }
+        }
+        return allF;
     }
     @Override
     public String toString() {
+        String friendsName="";
+        for(User t : allFriendsId()){
+            friendsName=friendsName+"、"+t.getIdNum();
+        }
+//        String groupsName="";
+//        for(String t : groups){
+//            friendsName=friendsName+t.getIdNum();
+//        }
         return "User [idNum=" + idNum + ", password=" + password + ", niname="
                 + niname + ", sex=" + sex + ", speakword=" + speakword
-                + ", photo=" + photo + ", friends=" + friends + "]";
+                + ", photo=" + photo + ", friends=" + friendsName + ", groups="
+                + groups + "]";
     }
+
     
 
 }

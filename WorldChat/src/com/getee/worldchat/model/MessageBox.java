@@ -1,12 +1,17 @@
 package com.getee.worldchat.model;
 
-public class MessageBox {
+import java.io.Serializable;
+
+public class MessageBox implements Serializable {
     private String content;//内容
     private User from;
     private User to;
     private int type;//来自MessType接口,固定格式
     private String time;//发送时间
     
+    /*
+     * 储存传递数据的类
+     */
     public MessageBox(String content, User from, User to, int type, String time) {
         this.content = content;
         this.from = from;
@@ -17,27 +22,6 @@ public class MessageBox {
     public MessageBox() {
         
     }
-    /*
-     * 静态方法用于直接打包产生一个MessageBox
-     */
-    public static MessageBox packLogin(String idNum,String password){
-        User user=new User();
-        user.setIdNum(idNum);
-        user.setPassword(password);
-        
-        MessageBox m=new MessageBox();
-        m.setType(MessHelp.LOGIN);
-        m.setFrom(user);
-        return m;
-        
-    }
-    public static MessageBox packRegist(User user){//注册消息
-         return null;
-    }
-    
-    public static MessageBox packTrue(User user){//注册消息
-        return null;
-   }
     @Override
     public String toString() {
         return "MessageBox [content=" + content + ", from=" + from + ", to="
