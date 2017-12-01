@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,7 +17,7 @@ import com.getee.worldchat.model.User;
 
 public class ServerContral {
     private ServerSocket ser;
-    private Map<User,ObjectOutputStream> allClient;//保存各个登录后用户的输出流，进行数据传递
+    private Map<String,ObjectOutputStream> allClient;//<idNum,write>保存各个登录后用户的输出流，进行数据传递
     
     
     public static void main(String[] args) {
@@ -46,7 +47,7 @@ public class ServerContral {
     }
     
     /*
-     * ================线程类，处理Socket 
+     * ====线程类，处理Socket 
      */
     class ClientSolveThread extends Thread{
         private ObjectOutputStream  out;
@@ -69,7 +70,11 @@ public class ServerContral {
                         disposeRegist();
                     }else if(type==MessHelp.LOGIN){
                         disposeLogin();
-                    }//。。。
+                    }else if(type==MessHelp.ONECHAT)
+                    {
+                        disposeOneChat();
+                    }
+                    //。。。
                     
                     /*
                      * 统一流只能读取一次，所以，可以统一后台读取，更新两个Frame。
@@ -84,7 +89,7 @@ public class ServerContral {
                 
             }
         }
-        /*
+        /*===============================================
          * 处理注册请求
          */
         private void disposeRegist(){
@@ -123,7 +128,7 @@ public class ServerContral {
             //System.out.println(user.getPassword()==messageFrom.getPassword());
             if(user!=null && user.getPassword().equals(messageFrom.getPassword()))
             {
-                allClient.put(user, out);//保存数据
+                allClient.put(user.getIdNum(), out);//保存每一个用户登录数据和对应的输出流*************
                 MessageBox m= PackMessage.packTrue(user);
                 try {
                     out.writeObject(m);
@@ -145,8 +150,44 @@ public class ServerContral {
                 }
             }
         }
+        /*
+         * 处理个人聊天
+         * 发送两份数据报给双方
+         */
+        private void disposeOneChat(){
+            MessageBox m=news;
+            m.setTime(new Date().toLocaleString());
+            String uTo=m.getTo().getIdNum();
+            String uFrom=m.getFrom().getIdNum();
+            for(String t: allClient.keySet()){
+                if(t.equals(uTo)){
+                    m.setType(MessHelp.REONETO);//这个是你要接收的数据，即将更新你的窗口=========
+                    /*
+                     * * * * * * * * * *用户不在线,新建一个线程循环等待用户上线,则建立临时本本寄存==在线再传递;* * * * * * * * * 
+                     */
+                    try {
+                        allClient.get(t).writeObject(m);
+                        allClient.get(t).flush();
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+                if(t.equals(uFrom)){
+                    m.setType(MessHelp.REONEFROM);//这个是你发送的数据，即将更新你的窗口
+                    try {
+                        allClient.get(t).writeObject(m);
+                        allClient.get(t).flush();
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+            }
+ 
+        }
         
         
         
-    }
+    }//thread类
 }

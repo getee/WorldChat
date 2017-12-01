@@ -24,7 +24,9 @@ public class DBOperation {
 //        
 //        DBOperation.creat(admin);
 
-       // User admin=select("3");
+//        User admin=select("3");
+//        admin.setPassword("3");
+//        edit(admin);
        //out.println(DBOperation.addFriend(admin, "2", "开黑"));
 //        System.out.println(admin);
 //        System.out.println(select("266"));
@@ -70,9 +72,9 @@ public class DBOperation {
         }
         return null;
     }
-    public static boolean addFriend(User user,String addID,String callName)//添加好友信息(自己类，添加的好友id,分组名)
+    public static boolean addFriend(User user,String addID,String call_Name)//添加好友信息(自己类，添加的好友id,分组名)
     {
-
+        String callName=call_Name.trim();//消空格
         User friend=select(addID);//查找该好友
         if(friend==null) return false;//不存在该好友
         Map<String,HashSet<User>> itm=user.getFriends();

@@ -44,7 +44,14 @@ public class PackMessage {
         m.setType(MessHelp.ISFALSE);
         return m;
    }
-    public MessageBox packOneChat(){return null;}//对一聊天消息
-    public MessageBox packAllChat(){return null;}//对多聊天消息
+    public static MessageBox packOneChat(User from,User to,String str){
+        MessageBox m=new MessageBox();
+        m.setFrom(from);
+        m.setTo(to);
+        m.setContent(str);
+        m.setType(MessHelp.ONECHAT);
+        return m;
+    }//对一聊天消息
+    public static MessageBox packAllChat(){return null;}//对多聊天消息
 
 }

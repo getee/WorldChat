@@ -17,10 +17,14 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.JLabel;
 
+import com.getee.worldchat.control.DBOperation;
+import com.getee.worldchat.control.PackMessage;
+import com.getee.worldchat.model.MessageBox;
 import com.getee.worldchat.model.PictureBath;
 import com.getee.worldchat.model.User;
 
 import java.awt.Color;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
@@ -44,9 +48,18 @@ public class OneChatFrame extends JFrame {
     private ObjectOutputStream out;
     private ObjectInputStream in;
     
+    /*
+     * 对话框由服务外界 reader进行控制
+     */
+    public JTextPane getTextPane() {
+        return textPane;
+    }
+    public void setTextPane(JTextPane textPane) {
+        this.textPane = textPane;
+    }
 
     public static void main(String[] args) {
-        new OneChatFrame();
+        new OneChatFrame(DBOperation.select("3"),DBOperation.select("2"));
     }
     
     public OneChatFrame(ObjectOutputStream out,ObjectInputStream in,JFrame FriendsFrame,User myself,User chatUser) {
@@ -56,18 +69,11 @@ public class OneChatFrame extends JFrame {
         this.FriendsFrame=FriendsFrame;
     }
     public OneChatFrame(User myself,User chatUser) {
-        this();
         this.myself=myself;
         this.chatUser=chatUser;
+        //this.FriendsFrame=FriendsFrame;
         setTitle("与"+chatUser.getNiname()+"聊天ing");
-    }
-
-
-
-    public OneChatFrame() {
-        setTitle("与XX聊天ing");
         this.setIconImage(PictureBath.ICON.getImage());//设置图标
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 971, 691);
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -80,7 +86,7 @@ public class OneChatFrame extends JFrame {
         contentPane.add(scrollPane);
         
         textPane = new JTextPane();
-        textPane.setText("对话框");
+        //textPane.setText();//"对话框"
         scrollPane.setViewportView(textPane);
         
         JPanel panel = new JPanel();
@@ -123,29 +129,60 @@ public class OneChatFrame extends JFrame {
         contentPane.add(scrollPane_1);
         
         textPane_1 = new JTextPane();
-        textPane_1.setText("输入框");
+        //textPane_1.setText("输入框");
         scrollPane_1.setViewportView(textPane_1);
         
         closeButton = new JButton("关闭");
         closeButton.setBackground(Color.GRAY);
         closeButton.setBounds(466, 589, 146, 34);
         contentPane.add(closeButton);
+        closeButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                OneChatFrame.this.setVisible(false);
+            }
+        });
         
         sendButton = new JButton("发送");
         sendButton.setBackground(Color.GRAY);
         sendButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                sendMessage();//发送消息
             }
         });
         sendButton.setBounds(628, 590, 146, 32);
         contentPane.add(sendButton);
         
-        JLabel lblNewLabel = new JLabel("对方头像");
+        ImageIcon head = new ImageIcon(chatUser.getPhoto());//对方头像图片
+        head.setImage(head.getImage().getScaledInstance(175,330,Image.SCALE_DEFAULT));
+        JLabel lblNewLabel = new JLabel(head);
         lblNewLabel.setBounds(774, 0, 175, 330);
         contentPane.add(lblNewLabel);
         
-        JLabel lblNewLabel_1 = new JLabel("自己头像");
+        ImageIcon myhead = new ImageIcon(myself.getPhoto());//自己头像图片
+        myhead.setImage(myhead.getImage().getScaledInstance(175,239,Image.SCALE_DEFAULT));
+        JLabel lblNewLabel_1 = new JLabel(myhead);
         lblNewLabel_1.setBounds(774, 384, 175, 239);
         contentPane.add(lblNewLabel_1);
+        
     }
+    private void sendMessage(){
+        /*
+         * textPane_1.getText();
+         * 变更为单消息对象的追加可修复，多线程传递时旧数据保存缺失
+         */
+        String str=textPane_1.getText();//***获取输入框中值，进行分装***
+        
+        MessageBox m=PackMessage.packOneChat(myself,chatUser,str);
+        try {
+            out.writeObject(m);
+            out.flush();
+            textPane_1.setText("");//输入框清空
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+//        textPane.setText(textPane.getText()+"\n"+str); 
+    }
+
+
 }

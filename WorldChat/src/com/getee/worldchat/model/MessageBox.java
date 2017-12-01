@@ -24,8 +24,13 @@ public class MessageBox implements Serializable {
     }
     @Override
     public String toString() {
-        return "MessageBox [content=" + content + ", from=" + from + ", to="
-                + to + ", type=" + type + ", time=" + time + "]";
+        String toStr="null";
+        if(to!=null) toStr=to.getIdNum();
+        String fromStr="null";
+        if(from!=null) fromStr=from.getIdNum();
+
+        return "MessageBox [content=" + content + ", from=" + toStr + ", to="
+                + fromStr + ", type=" + type + ", time=" + time + "]";
     }
     public String getTime() {
         return time;
