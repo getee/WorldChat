@@ -33,11 +33,13 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.JButton;
 
+import com.getee.worldchat.control.DBGroup;
 import com.getee.worldchat.control.DBOperation;
 import com.getee.worldchat.model.MessHelp;
 import com.getee.worldchat.model.MessageBox;
 import com.getee.worldchat.model.PictureBath;
 import com.getee.worldchat.model.User;
+
 
 
 
@@ -63,6 +65,8 @@ public class FriendsFrame extends JFrame{
   //为了能记录所有和我聊过天的好友信息(打开过聊天界面的好友信息)，<对方Id号,界面>
     private Map<String,OneChatFrame>  allFrames=new HashMap<>();
     //需要打开frame;   接受者解析from  \   发送者解析to
+    private Map<String,CrowdFrame>  allGroup=new HashMap<>();
+
     
     private AddFriendFrame  addFrame;
     private JTextField textField;
@@ -86,7 +90,8 @@ public class FriendsFrame extends JFrame{
         return tree;
     }
     public static void main(String[] args) {
-        User admin =DBOperation.select("1");
+        User admin =DBGroup.select("666"); //DBOperation.select("1");
+        //User admin =DBOperation.select("1");
         new FriendsFrame(admin);
     }
     public FriendsFrame(ObjectOutputStream out,ObjectInputStream in,User user) {
@@ -136,7 +141,16 @@ public class FriendsFrame extends JFrame{
             public void mouseClicked(MouseEvent e) {
                 if(user.getGroups().size()==0) return ;
                 if(e.getButton()==1&&e.getClickCount()==2) {
+                    String groupName=list.getSelectedValue().toString();
                     
+                    if(allGroup.get(groupName)!=null){
+                            allGroup.get(groupName).setVisible(true);
+                            return;
+                    }
+
+                    CrowdFrame   chat=new CrowdFrame(out,in,FriendsFrame.this,user,(User)list.getSelectedValue());
+                    chat.setVisible(true);//让聊天界面显示出来
+                    allGroup.put(groupName, chat);
                 }
             }
         });
@@ -150,7 +164,7 @@ public class FriendsFrame extends JFrame{
      */
     public FriendsFrame(User user) {
         this.user=user;
-
+        
         this.setIconImage(PictureBath.ICON.getImage());//设置图标
         this.setBounds(100, 100, 354, 739);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -217,8 +231,12 @@ public class FriendsFrame extends JFrame{
         scrollPane_1 = new JScrollPane();
         tabbedPane.addTab("New tab", null, scrollPane_1, null);
         
-        String[] strGroup=user.getGroups().toArray(new String[]{});//Set2Array  遍历所有群
-        list = new JList<String>(strGroup);
+        
+        
+        
+        
+        User[] strGroup=user.getGroups().toArray(new User[]{});//Set2Array  遍历所有群
+        list = new JList<User>(strGroup);
         list.setForeground(Color.ORANGE);
         list.setFont(new Font("华文行楷", Font.PLAIN, 24));
         
@@ -227,11 +245,14 @@ public class FriendsFrame extends JFrame{
         JScrollPane scrollPane_2 = new JScrollPane();
         tabbedPane.addTab("New tab", null, scrollPane_2, null);
         
-
+        
+        
+        
+        
+        
+        
         //System.out.println("=======================================================================");
 
-        
-        
         DefaultMutableTreeNode  root=new DefaultMutableTreeNode("root");
         
         //定义一个jtree根节点，所有的好友分组和好友都在这个根节点上往上放

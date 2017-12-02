@@ -2,6 +2,7 @@ package com.getee.worldchat.view;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.Image;
 
 import javax.swing.JFrame;
@@ -18,12 +19,20 @@ import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
 
 import java.awt.Color;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.Set;
 
 import javax.swing.JList;
 
+import com.getee.worldchat.control.DBGroup;
+import com.getee.worldchat.control.DBOperation;
+import com.getee.worldchat.model.GroupLevel;
 import com.getee.worldchat.model.PictureBath;
+import com.getee.worldchat.model.User;
 
 public class CrowdFrame extends JFrame {
+    private JFrame FriendsFrame;
 
     private JPanel contentPane;
     private JTextPane textPane;//对话框
@@ -36,15 +45,31 @@ public class CrowdFrame extends JFrame {
     private JButton shotButton;
     private JButton voiceButton;
     private JScrollPane scrollPane_2;
-    private JList list;
+    private JList list;//群列表
+    
+    private User myself;//自身的对象
+    private User chatGroup;//聊天的对象
+
+    private ObjectOutputStream out;
+    private ObjectInputStream in;
 
 
     public static void main(String[] args) {
-        new CrowdFrame();
+        new CrowdFrame(DBOperation.select("1"),DBGroup.select("666"));
+    }
+    
+    public CrowdFrame(ObjectOutputStream out,ObjectInputStream in,JFrame FriendsFrame,User myself,User chatGroup) {
+        this(myself,chatGroup);
+        this.in=in;
+        this.out=out;
+        this.FriendsFrame=FriendsFrame;
     }
 
-    public CrowdFrame() {
-        setTitle("与XX聊天ing");
+    /**
+     * @wbp.parser.constructor
+     */
+    public CrowdFrame(User myself,User chatGroup) {
+        setTitle(chatGroup.getNiname());
         this.setIconImage(PictureBath.ICON.getImage());//设置图标
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 971, 691);
@@ -119,7 +144,10 @@ public class CrowdFrame extends JFrame {
         sendButton.setBounds(537, 587, 146, 32);
         contentPane.add(sendButton);
         
-        JLabel lblNewLabel = new JLabel("广告区招租");
+        
+        ImageIcon head = new ImageIcon(chatGroup.getPhoto());//对方头像图片
+        head.setImage(head.getImage().getScaledInstance(264,170,Image.SCALE_DEFAULT));
+        JLabel lblNewLabel = new JLabel(head);
         lblNewLabel.setBounds(685, 0, 264, 170);
         contentPane.add(lblNewLabel);
         
@@ -127,7 +155,13 @@ public class CrowdFrame extends JFrame {
         scrollPane_2.setBounds(685, 252, 264, 368);
         contentPane.add(scrollPane_2);
         
-        list = new JList();
+        Set<User> suu=chatGroup.getFriends().get(GroupLevel.NOMAL);
+        System.out.println(suu);
+        User[] strGroup=suu.toArray(new User[]{});//Set2Array  遍历所有群
+        list = new JList<User>(strGroup);
+        list.setForeground(Color.ORANGE);
+        list.setFont(new Font("华文楷体", Font.PLAIN, 24));
+
         scrollPane_2.setViewportView(list);
     }
 }

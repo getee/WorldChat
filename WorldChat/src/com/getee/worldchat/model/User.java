@@ -108,6 +108,9 @@ public class User implements Serializable {
     }
     @Override
     public String toString() {
+        return "" + niname +"("+ idNum + "天地)";
+    }
+    public String toString(int i) {
         String friendsName="";
         Set<User> allF = allFriendsId();
         if(allF!=null){
