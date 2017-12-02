@@ -6,9 +6,12 @@ import java.net.Socket;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
+import com.getee.worldchat.control.DBGroup;
 import com.getee.worldchat.control.DBOperation;
 import com.getee.worldchat.control.PackMessage;
+import com.getee.worldchat.model.GroupLevel;
 import com.getee.worldchat.model.MessHelp;
 import com.getee.worldchat.model.MessageBox;
 import com.getee.worldchat.model.User;
@@ -79,6 +82,14 @@ public class ServerContral {
                     {
                         disposeAddFriend();
                     }
+                    else if(type==MessHelp.ALLCHAT)
+                    {
+                        disposeAllChat();
+                    }
+                    else if(type==MessHelp.SELECTGROUP)
+                    {
+                        disposeSelectGroup();
+                    }
                     //。。。
                     
                     /*
@@ -143,6 +154,8 @@ public class ServerContral {
                     e.printStackTrace();
                 }
                 willDo(user.getIdNum(),out);
+                
+                willCrowd(user.getIdNum(),out);
             }
             else
             {
@@ -181,10 +194,8 @@ public class ServerContral {
                 }
                 if(t.equals(uTo)){
                     m.setType(MessHelp.REONETO);//这个是你要接收的数据，即将更新你的窗口=========
-                    /*
-                     * * * * * * * * * *用户不在线,新建一个线程 循环等待用户上线,则建立临时本本寄存==在线再传递;* * * * * * * * * 
-                     */
-                    isOnline=true;
+                    
+                    isOnline=true;//不在线标记。。。。。
 
                     try {
                         allClient.get(t).writeObject(m);
@@ -195,12 +206,16 @@ public class ServerContral {
                     }
                 }
             }
+            /*
+             * * * * * * * * * *用户不在线,新建一个文件 ，等待用户上线,则建立临时本本寄存==在线再传递;* * * * * * * * * 
+             */
             if(!isOnline){//建立代办事项
                 File f=new File("willdo/"+uTo+".read");
                 try {
                     ObjectOutputStream fout=new ObjectOutputStream(new FileOutputStream(f));
                     fout.writeObject(m);
                     fout.flush();
+                    fout.close();
                 } catch (FileNotFoundException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -220,9 +235,33 @@ public class ServerContral {
                 ObjectInputStream fin=new ObjectInputStream(new FileInputStream(f));
                 MessageBox m=(MessageBox)fin.readObject();
                 m.setType(MessHelp.REONETO);//这个是你要接收的数据，即将更新你的窗口=========
+                fin.close();
+                System.out.println(f.delete());
                 out.writeObject(m);
                 out.flush();
-                f.delete();
+                
+            } catch (FileNotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+        }
+        private void willCrowd(String str,ObjectOutputStream out){
+            File f=new File("willdo/"+str+".gread");
+            if(!f.exists())return ;
+            
+            try {
+                ObjectInputStream fin=new ObjectInputStream(new FileInputStream(f));
+                MessageBox m=(MessageBox)fin.readObject();
+                m.setType(MessHelp.REALLTO);//这个是你要接收的数据，即将更新你的窗口=========
+                fin.close();
+                System.out.println(f.delete());
+                out.writeObject(m);
+                out.flush();
+                
             } catch (FileNotFoundException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -269,7 +308,81 @@ public class ServerContral {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
+        }
+        private void disposeAllChat(){//==============================qun聊
+            MessageBox m=news;
+            m.setTime(new Date().toLocaleString());
+            //System.out.println(m.getTo());
             
+//            String idFrom=m.getFrom().getIdNum();
+//            for(String t: allClient.keySet())
+//            {
+//                if(t.equals(idFrom)){
+//                    m.setType(MessHelp.REALLFROM);//这个是你发送的数据，即将更新你的窗口
+//                    try {
+//                        allClient.get(t).writeObject(m);
+//                        allClient.get(t).flush();
+//                    } catch (IOException e) {
+//                        // TODO Auto-generated catch block
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
+            /*
+             * 出现错误，将会显现出一个人的消息在群中接收到两遍================================优化建议删除上面那个循环=========================
+             * 出现错误，将会显现出一个人的消息在群中接收到两遍================================优化建议删除上面那个循环=========================
+             * 出现错误，将会显现出一个人的消息在群中接收到两遍================================优化建议删除上面那个循环=========================
+             */
+            Set<User> member=m.getTo().getFriends().get(GroupLevel.NOMAL);//获取到群成员的Set<>
+            System.out.println(m.getTo());
+            for(User u:member){
+                String idTo=u.getIdNum();//对应着每个接收消息群成员的id
+                boolean isOnline=false;
+                for(String t: allClient.keySet())
+                {
+                    if(t.equals(idTo)){
+                        m.setType(MessHelp.REALLTO);//这个是你要接收的数据，即将更新你的窗口=========
+                        isOnline=true;//不在线标记。。。。。
+                        try {
+                            allClient.get(t).writeObject(m);
+                            allClient.get(t).flush();
+                        } catch (IOException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                /*
+                 * * * * * * * * * *用户不在线,新建一个文件 ，等待用户上线,则建立临时本本寄存==在线再传递;* * * * * * * * * 
+                 */
+                if(!isOnline){//建立代办事项
+                    File f=new File("willdo/"+idTo+".gread");
+                    try {
+                        ObjectOutputStream fout=new ObjectOutputStream(new FileOutputStream(f));
+                        fout.writeObject(m);
+                        fout.flush();
+                        fout.close();
+                    } catch (FileNotFoundException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }//disposeAllChat
+        private void disposeSelectGroup(){
+            MessageBox m=news;
+            m.setTo(DBGroup.select(m.getContent()));
+            m.setType(MessHelp.REGROUP);
+            try {
+                out.writeObject(m);
+                out.flush();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
         
         

@@ -29,13 +29,15 @@ public class DBGroup {
 //        group.setPhoto("source/头像4.jpg");
 //        group.setSpeakword("悔罪净化灵魂， 劳动重塑自我！");
 //        edit(group);
-//        User u=DBOperation.select("1");
-//        addGroup(u, "666");
+//        User u=DBOperation.select("2");
+//        System.out.println(addGroup(u, "666"));
 
+
+      //System.out.println(select("666").getFriends().get(GroupLevel.NOMAL));
     }
     public static User select(String idNum)//查找账户。。。。添加群
     {
-        File file=new File("groupinfo/"+idNum+".wcg");//群信息后缀不同
+        File file=new File("groupinfo/"+idNum.trim()+".wcg");//群信息后缀不同
         if(!file.exists())return null;
         
         ObjectInputStream obj = null;

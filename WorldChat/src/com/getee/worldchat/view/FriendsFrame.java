@@ -147,10 +147,25 @@ public class FriendsFrame extends JFrame{
                             allGroup.get(groupName).setVisible(true);
                             return;
                     }
+                    User g=(User)list.getSelectedValue();
+                    String groupID=g.getIdNum();
+                    MessageBox m=new MessageBox();
+                    m.setType(MessHelp.SELECTGROUP);
+                    m.setContent(groupID);//传递groupId号查找
+                    m.setFrom(user);
+                    try {
+                        out.writeObject(m);
+                        out.flush();
+                    } catch (IOException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    }
 
-                    CrowdFrame   chat=new CrowdFrame(out,in,FriendsFrame.this,user,(User)list.getSelectedValue());
-                    chat.setVisible(true);//让聊天界面显示出来
-                    allGroup.put(groupName, chat);
+                                /*
+                                 * 没必要定义Set<User>  ,因为群的更改不是相互的
+                                 * (User)list.getSelectedValue(),此处是 旧Group,需要标记从服务器读取
+                                 */
+                    
                 }
             }
         });
@@ -336,6 +351,15 @@ public class FriendsFrame extends JFrame{
                     }else if(type==MessHelp.READDFRIEND){//个人查找信息返回
                         processReAdd();
                     }
+//                    else if(type==MessHelp.REALLFROM){//个人->群发送信息返回
+//                        processAllFrom();
+//                    }
+                    else if(type==MessHelp.REALLTO){//群->个人接收信息返回
+                        processAllTo();
+                    }
+                    else if(type==MessHelp.REGROUP){//群->个人接收信息返回
+                        processRegroup();
+                    }
 
                 } catch (ClassNotFoundException e) {
                     // TODO Auto-generated catch block
@@ -350,7 +374,7 @@ public class FriendsFrame extends JFrame{
          * 处理个人消息返回process
          */
         private void processOneFrom(){
-            String frindID=news.getTo().getIdNum();//你发送的id
+            String frindID=news.getTo().getIdNum();//你发送给的id
             OneChatFrame one=allFrames.get(frindID);
             if(one==null){//如果没有该窗口就新建一个
                 one=new OneChatFrame(out,in,FriendsFrame.this,user,news.getTo());
@@ -374,7 +398,7 @@ public class FriendsFrame extends JFrame{
          * 处理个人消息接收
          */
         private void processOneTo(){//个人接收信息返回
-            System.out.println("yyyyyyyyyyyyyyyyyyy");
+
             String frindID=news.getFrom().getIdNum();//发送信息的id
             OneChatFrame one=allFrames.get(frindID);
             if(one==null){//如果没有该窗口就新建一个
@@ -437,7 +461,7 @@ public class FriendsFrame extends JFrame{
           addFrame.setAddUser(u);
 
         }
-        private void processReAdd(){
+        private void processReAdd(){//交给下级add好友调用
             String str=news.getContent();
             if(str.equals("true")){
                 JOptionPane.showMessageDialog(null, "添加成功!","提示",JOptionPane.INFORMATION_MESSAGE);
@@ -446,12 +470,69 @@ public class FriendsFrame extends JFrame{
                 JOptionPane.showMessageDialog(null, "添加失败!","提示",JOptionPane.INFORMATION_MESSAGE);
             }
         }
+        /*private void processAllFrom(){//更新自己的界面
+            String groupID=news.getTo().getIdNum();//你发送的群id
+            CrowdFrame one=allGroup.get(groupID);
+            if(one==null){//如果没有该窗口就新建一个
+                one=new CrowdFrame(out,in,FriendsFrame.this,user,news.getTo());
+                allGroup.put(groupID, one);
+            }
+            one.setVisible(true);//让聊天界面显示出来
+            JTextPane textPane =one.getTextPane();//获取对话框的句柄
+            String str=" "+news.getFrom().getNiname()+" \t"+news.getTime()+"\n"+news.getContent()+"\n";
+            
+            SimpleAttributeSet attrset = new SimpleAttributeSet();//样式类
+            StyleConstants.setFontSize(attrset,16);//设置字体大小
+            StyleConstants.setForeground(attrset,Color.BLUE);//自己消息是颜色 
+            Document docs = textPane.getDocument();//获得文本对象
+            try {
+                docs.insertString(docs.getLength(),str , attrset);//对文本进行追加(文本末位处,String,样式)
+            } catch (BadLocationException e) {
+                e.printStackTrace();
+            }
+        }
+        */
+        private void processAllTo(){//接收信息的群界面
+            String groupID=news.getTo().getIdNum();//发送信息的id==========所有人都是解析to用户
+            CrowdFrame one=allGroup.get(groupID);
+            if(one==null){//如果没有该窗口就新建一个
+                one=new CrowdFrame(out,in,FriendsFrame.this,user,news.getTo());
+                allGroup.put(groupID, one);
+            }
+            one.setVisible(true);//让聊天界面显示出来
+            JTextPane textPane =one.getTextPane();//获取对话框的句柄
+            String str=" "+news.getFrom().getNiname()+" \t"+news.getTime()+"\n"+news.getContent()+"\n";
+
+            SimpleAttributeSet attrset = new SimpleAttributeSet();//样式类
+            StyleConstants.setFontSize(attrset,16);//设置字体大小
+            if(user.getIdNum().equals(news.getFrom().getIdNum()))
+            {
+                StyleConstants.setForeground(attrset,Color.BLUE);//自己消息是颜色
+            }
+            else
+            {
+                StyleConstants.setForeground(attrset,Color.GREEN);//别人消息是颜色 
+            }
+            Document docs = textPane.getDocument();//获得文本对象
+            try {
+                docs.insertString(docs.getLength(),str , attrset);//对文本进行追加(文本末位处,String,样式)
+            } catch (BadLocationException e) {
+                e.printStackTrace();
+            }
+        }
+        private void processRegroup(){
+            
+            User group=news.getTo();
+            CrowdFrame   chat=new CrowdFrame(out,in,FriendsFrame.this,user,group);
+            chat.setVisible(true);//让聊天界面显示出来
+            allGroup.put(group.getIdNum(), chat);
+            
+        }
         
         
         
         
-        
-    }
+    }//Thread
 }
 
 

@@ -19,6 +19,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
 
 import java.awt.Color;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Set;
@@ -27,7 +28,9 @@ import javax.swing.JList;
 
 import com.getee.worldchat.control.DBGroup;
 import com.getee.worldchat.control.DBOperation;
+import com.getee.worldchat.control.PackMessage;
 import com.getee.worldchat.model.GroupLevel;
+import com.getee.worldchat.model.MessageBox;
 import com.getee.worldchat.model.PictureBath;
 import com.getee.worldchat.model.User;
 
@@ -63,15 +66,18 @@ public class CrowdFrame extends JFrame {
         this.in=in;
         this.out=out;
         this.FriendsFrame=FriendsFrame;
+        
     }
 
     /**
      * @wbp.parser.constructor
      */
     public CrowdFrame(User myself,User chatGroup) {
+        this.myself=myself;
+        this.chatGroup=chatGroup;
         setTitle(chatGroup.getNiname());
         this.setIconImage(PictureBath.ICON.getImage());//设置图标
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        //setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 971, 691);
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -84,7 +90,7 @@ public class CrowdFrame extends JFrame {
         contentPane.add(scrollPane);
         
         textPane = new JTextPane();
-        textPane.setText("对话框");
+        textPane.setText("");
         scrollPane.setViewportView(textPane);
         
         JPanel panel = new JPanel();
@@ -127,18 +133,24 @@ public class CrowdFrame extends JFrame {
         contentPane.add(scrollPane_1);
         
         textPane_1 = new JTextPane();
-        textPane_1.setText("输入框");
+        textPane_1.setText("");
         scrollPane_1.setViewportView(textPane_1);
         
         closeButton = new JButton("关闭");
         closeButton.setBackground(Color.GRAY);
         closeButton.setBounds(375, 586, 146, 34);
         contentPane.add(closeButton);
+        closeButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                CrowdFrame.this.setVisible(false);
+            }
+        });
         
         sendButton = new JButton("发送");
         sendButton.setBackground(Color.GRAY);
         sendButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                sendMessage();//发送消息
             }
         });
         sendButton.setBounds(537, 587, 146, 32);
@@ -154,8 +166,9 @@ public class CrowdFrame extends JFrame {
         scrollPane_2 = new JScrollPane();
         scrollPane_2.setBounds(685, 252, 264, 368);
         contentPane.add(scrollPane_2);
-        
+        System.out.println(chatGroup.getFriends());
         Set<User> suu=chatGroup.getFriends().get(GroupLevel.NOMAL);
+        
         System.out.println(suu);
         User[] strGroup=suu.toArray(new User[]{});//Set2Array  遍历所有群
         list = new JList<User>(strGroup);
@@ -164,4 +177,24 @@ public class CrowdFrame extends JFrame {
 
         scrollPane_2.setViewportView(list);
     }
+    private void sendMessage(){
+        String str=textPane_1.getText();//***获取输入框中值，进行分装***
+        
+        MessageBox m=PackMessage.packAllChat(myself,chatGroup,str);
+        try {
+            out.writeObject(m);
+            out.flush();
+            textPane_1.setText("");//输入框清空
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+//        textPane.setText(textPane.getText()+"\n"+str); 
+    }
+
+    public JTextPane getTextPane() {
+        return textPane;
+    }
+    
+    
 }

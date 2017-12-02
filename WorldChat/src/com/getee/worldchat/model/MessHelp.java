@@ -13,7 +13,8 @@ public interface MessHelp {
     public int ALLCHAT=3;//群聊
     public int ADDFRIEND=4;//加好友
     public int SEARCH=5;//搜索好友
-    public int UPDATE=6;//更新信息
+    public int SELECTGROUP=6;//选择群
+    public int UPDATE=7;//更新信息
     
     /*
      * 服务器填写pack,客户机验证的if
@@ -26,6 +27,9 @@ public interface MessHelp {
     
     public int RESEARCH=14;//返回客户机，用于回复添加好友
     public int READDFRIEND=15;//返回客户机，用于回复添加好友
+    
+    public int REGROUP=16;//返回群信息
+
 
     public int ISTRUE=18;//返回客户机，纯粹用于客户端，确认操作是否成功
     public int ISFALSE=19;//返回客户机，纯粹用于客户端，提示操作失败

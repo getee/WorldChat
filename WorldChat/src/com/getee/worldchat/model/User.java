@@ -108,7 +108,7 @@ public class User implements Serializable {
     }
     @Override
     public String toString() {
-        return "" + niname +"("+ idNum + "天地)";
+        return "" + niname +"("+ idNum + ")";
     }
     public String toString(int i) {
         String friendsName="";
@@ -126,6 +126,35 @@ public class User implements Serializable {
                 + niname + ", sex=" + sex + ", speakword=" + speakword
                 + ", photo=" + photo + ", friends=" + friendsName + ", groups="
                 + groupsName + "]";
+    }
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((idNum == null) ? 0 : idNum.hashCode());
+        result = prime * result + ((niname == null) ? 0 : niname.hashCode());
+        return result;
+    }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        User other = (User) obj;
+        if (idNum == null) {
+            if (other.idNum != null)
+                return false;
+        } else if (!idNum.equals(other.idNum))
+            return false;
+        if (niname == null) {
+            if (other.niname != null)
+                return false;
+        } else if (!niname.equals(other.niname))
+            return false;
+        return true;
     }
 
     
