@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.getee.worldchat.model.GroupLevel;
 import com.getee.worldchat.model.User;
 
 public class DBGroup {
@@ -27,8 +28,8 @@ public class DBGroup {
 //        group.setPhoto("source/头像7.jpg");
 //        group.setSpeakword("悔罪净化灵魂， 劳动重塑自我！");
 //        creat(group);
-        User u=DBOperation.select("1");
-        addGroup(u, "666");
+//        User u=DBOperation.select("1");
+//        addGroup(u, "666");
 
     }
     public static User select(String idNum)//查找账户。。。。添加群
@@ -73,11 +74,11 @@ public class DBGroup {
 
         User group=select(addID);//查找该群
         if(group==null) return false;//不存在该群
-        Set<String> its=user.getGroups();
-        its.add(addID);
+        Set<User> its=user.getGroups();
+        its.add(group);
         if(DBOperation.edit(user))return false;        //保存用户添加的群
 
-        String level="nomal";
+        String level=GroupLevel.NOMAL;//定义群级别，应该为常量@err
         Map<String,HashSet<User>> gm=group.getFriends();//取出该群中的所有成员集合
         HashSet<User> gs=gm.get(level);//取出该小组中的所有成员集合
         if(gs==null){

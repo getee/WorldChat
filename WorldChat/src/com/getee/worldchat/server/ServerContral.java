@@ -1,8 +1,6 @@
 package com.getee.worldchat.server;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Date;
@@ -144,6 +142,7 @@ public class ServerContral {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
+                willDo(user.getIdNum(),out);
             }
             else
             {
@@ -157,6 +156,7 @@ public class ServerContral {
                 }
             }
         }
+        
         /*
          * 处理个人聊天
          * 发送两份数据报给双方
@@ -166,20 +166,9 @@ public class ServerContral {
             m.setTime(new Date().toLocaleString());
             String uTo=m.getTo().getIdNum();
             String uFrom=m.getFrom().getIdNum();
-            for(String t: allClient.keySet()){
-                if(t.equals(uTo)){
-                    m.setType(MessHelp.REONETO);//这个是你要接收的数据，即将更新你的窗口=========
-                    /*
-                     * * * * * * * * * *用户不在线,新建一个线程 循环等待用户上线,则建立临时本本寄存==在线再传递;* * * * * * * * * 
-                     */
-                    try {
-                        allClient.get(t).writeObject(m);
-                        allClient.get(t).flush();
-                    } catch (IOException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                }
+            boolean isOnline=false;
+            for(String t: allClient.keySet())
+            {
                 if(t.equals(uFrom)){
                     m.setType(MessHelp.REONEFROM);//这个是你发送的数据，即将更新你的窗口
                     try {
@@ -190,8 +179,58 @@ public class ServerContral {
                         e.printStackTrace();
                     }
                 }
+                if(t.equals(uTo)){
+                    m.setType(MessHelp.REONETO);//这个是你要接收的数据，即将更新你的窗口=========
+                    /*
+                     * * * * * * * * * *用户不在线,新建一个线程 循环等待用户上线,则建立临时本本寄存==在线再传递;* * * * * * * * * 
+                     */
+                    isOnline=true;
+
+                    try {
+                        allClient.get(t).writeObject(m);
+                        allClient.get(t).flush();
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
             }
- 
+            if(!isOnline){//建立代办事项
+                File f=new File("willdo/"+uTo+".read");
+                try {
+                    ObjectOutputStream fout=new ObjectOutputStream(new FileOutputStream(f));
+                    fout.writeObject(m);
+                    fout.flush();
+                } catch (FileNotFoundException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        }
+        /*
+         * 建立待读取聊天，以便于上线后读取
+         */
+        private void willDo(String str,ObjectOutputStream out){
+            File f=new File("willdo/"+str+".read");
+            if(!f.exists())return ;
+            try {
+                ObjectInputStream fin=new ObjectInputStream(new FileInputStream(f));
+                MessageBox m=(MessageBox)fin.readObject();
+                m.setType(MessHelp.REONETO);//这个是你要接收的数据，即将更新你的窗口=========
+                out.writeObject(m);
+                out.flush();
+                f.delete();
+            } catch (FileNotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
         }
         /*
          * 处理加好友

@@ -25,6 +25,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JComboBox;
 import javax.swing.JTextPane;
 import javax.swing.JTree;
+import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
 import javax.swing.text.*;
 import javax.swing.tree.DefaultTreeModel;
@@ -37,6 +38,7 @@ import com.getee.worldchat.model.MessHelp;
 import com.getee.worldchat.model.MessageBox;
 import com.getee.worldchat.model.PictureBath;
 import com.getee.worldchat.model.User;
+
 
 
 
@@ -127,6 +129,14 @@ public class FriendsFrame extends JFrame{
                         chat.setVisible(true);//让聊天界面显示出来
                         allFrames.put(idNum, chat);
                     }
+                }
+            }
+        });
+        list.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                if(user.getGroups().size()==0) return ;
+                if(e.getButton()==1&&e.getClickCount()==2) {
+                    
                 }
             }
         });
@@ -238,7 +248,6 @@ public class FriendsFrame extends JFrame{
             for(String groupName:allGroupNames) {
                 DefaultMutableTreeNode  group=new DefaultMutableTreeNode(groupName);//构造出每个组名的对应的TreeNode对象
                 HashSet<User>  friendsOfGroup=allFriends.get(groupName);
-                System.out.println(groupName);
                 for(User u:friendsOfGroup) {
                     DefaultMutableTreeNode  friend=new DefaultMutableTreeNode(u.getNiname()+"  ["+u.getIdNum()+"]");
                     group.add(friend);
@@ -344,6 +353,7 @@ public class FriendsFrame extends JFrame{
          * 处理个人消息接收
          */
         private void processOneTo(){//个人接收信息返回
+            System.out.println("yyyyyyyyyyyyyyyyyyy");
             String frindID=news.getFrom().getIdNum();//发送信息的id
             OneChatFrame one=allFrames.get(frindID);
             if(one==null){//如果没有该窗口就新建一个
@@ -422,3 +432,47 @@ public class FriendsFrame extends JFrame{
         
     }
 }
+
+
+
+/*
+ * 设置List图片
+ */
+class   CellRenderer   extends   JLabel   implements   ListCellRenderer  
+{  
+      /*类CellRenderer继承JLabel并实作ListCellRenderer.由于我们利用JLabel易于插图的特性，因此CellRenderer继承了JLabel  
+        *可让JList中的每个项目都视为是一个JLabel.  
+        */  
+        CellRenderer()  
+        {  
+                setOpaque(true);  
+        }  
+        /*从这里到结束：实作getListCellRendererComponent()方法*/  
+        public   Component   getListCellRendererComponent(JList   list,  
+                                                        Object   value,  
+                                                        int   index,  
+                                                        boolean   isSelected,  
+                                                        boolean   cellHasFocus)  
+        {        
+                /*我们判断list.getModel().getElementAt(index)所返回的值是否为null,例如上个例子中，若JList的标题是"你玩过哪  
+                  *些数据库软件"，则index>=4的项目值我们全都设为null.而在这个例子中，因为不会有null值，因此有没有加上这个判  
+                  *断并没有关系.  
+                  */  
+                if   (value   !=   null)  
+                {  
+                        setText(value.toString());  
+                        //setIcon(new   ImageIcon(""+(index+1)+".jpg")); // 设置图片
+                }  
+                if   (isSelected)   {  
+                        setBackground(list.getSelectionBackground());  
+                        setForeground(list.getSelectionForeground());  
+                }  
+                else   {  
+                        //设置选取与取消选取的前景与背景颜色.  
+                        setBackground(list.getBackground());  
+                        setForeground(list.getForeground());  
+                }  
+                return   this;  
+        }          
+}
+

@@ -21,15 +21,17 @@ public class User implements Serializable {
     private Map<String,HashSet<User>> friends;//列表:<分组名,分组中好友>
             //# <群管理，成员>
     
-    private Set<String> groups;//群聊列表:<群id名>仅当在群聊中说话时启动查看,添加了哪些群
+    private Set<User> groups;//群聊列表:<群id名>仅当在群聊中说话时启动查看,添加了哪些群
     
 
-    public Set<String> getGroups() {//差一个toString
+    //差一个toString
+    public Set<User> getGroups() {
         return groups;
     }
-    public void setGroups(Set<String> groups) {
+    public void setGroups(Set<User> groups) {
         this.groups = groups;
     }
+    
     public User(String idNum, String password, String niname, String sex,
             String speakword) {
         this();
@@ -40,6 +42,7 @@ public class User implements Serializable {
         this.speakword = speakword;
                 
     }
+
     public User()
     {
         this.friends = new TreeMap<>();//好友不能直接构造
@@ -112,14 +115,14 @@ public class User implements Serializable {
                 friendsName=friendsName+"、"+t.getIdNum();
             }
         }
-//        String groupsName="";
-//        for(String t : groups){
-//            friendsName=friendsName+t.getIdNum();
-//        }
+        String groupsName="";
+        for(User t : groups){
+            friendsName=friendsName+t.getIdNum();
+        }
         return "User [idNum=" + idNum + ", password=" + password + ", niname="
                 + niname + ", sex=" + sex + ", speakword=" + speakword
                 + ", photo=" + photo + ", friends=" + friendsName + ", groups="
-                + groups + "]";
+                + groupsName + "]";
     }
 
     

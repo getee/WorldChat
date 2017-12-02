@@ -1,5 +1,6 @@
 package com.getee.worldchat.view;
 
+import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.Image;
 import java.awt.Window;
@@ -14,10 +15,12 @@ import java.net.UnknownHostException;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import javax.swing.JButton;
+import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
 
 import com.getee.worldchat.control.PackMessage;
