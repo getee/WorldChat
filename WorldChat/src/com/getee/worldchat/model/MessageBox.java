@@ -2,13 +2,15 @@ package com.getee.worldchat.model;
 
 import java.io.Serializable;
 
+import javax.swing.text.SimpleAttributeSet;
+
 public class MessageBox implements Serializable {
     private String content;//内容
     private User from;
     private User to;
     private int type;//来自MessType接口,固定格式
     private String time;//发送时间
-    
+    private SimpleAttributeSet attrset;//样式只在聊天对话框中可以体现
     /*
      * 储存传递数据的类
      */
@@ -31,6 +33,12 @@ public class MessageBox implements Serializable {
 
         return "MessageBox [content=" + content + ", from=" + toStr + ", to="
                 + fromStr + ", type=" + type + ", time=" + time + "]";
+    }
+    public SimpleAttributeSet getAttrset() {
+        return attrset;
+    }
+    public void setAttrset(SimpleAttributeSet attrset) {
+        this.attrset = attrset;
     }
     public String getTime() {
         return time;

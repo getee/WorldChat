@@ -17,13 +17,20 @@ public class DBGroup {
     /*
      * 由服务器类调用
      * 加群操作，查找，创建，把群当做一个user
+     * 应该定义一个上层接口，其子实现分为用户，和群
      */
 
-//    public static void main(String[] args) {
-//        // TODO Auto-generated method stub
-//        
-//
-//    }
+    public static void main(String[] args) {
+//        User group=new User();
+//        group.setIdNum("666");
+//        group.setNiname("大理寺");
+//        group.setPhoto("source/头像7.jpg");
+//        group.setSpeakword("悔罪净化灵魂， 劳动重塑自我！");
+//        creat(group);
+        User u=DBOperation.select("1");
+        addGroup(u, "666");
+
+    }
     public static User select(String idNum)//查找账户。。。。添加群
     {
         File file=new File("groupinfo/"+idNum+".wcg");//群信息后缀不同
@@ -61,7 +68,7 @@ public class DBGroup {
     /*
      * 用户要加群时调用
      */
-    public static boolean addGroup(User user,String addID)//添加群信息(自己类，添加的群id,分组名)
+    public static boolean addGroup(User user,String addID)//添加群信息(自己类，添加的群id)
     {
 
         User group=select(addID);//查找该群

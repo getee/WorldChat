@@ -73,6 +73,13 @@ public class ServerContral {
                     }else if(type==MessHelp.ONECHAT)
                     {
                         disposeOneChat();
+                    }else if(type==MessHelp.SEARCH)
+                    {
+                        disposeSearch();
+                    }
+                    else if(type==MessHelp.ADDFRIEND)
+                    {
+                        disposeAddFriend();
                     }
                     //。。。
                     
@@ -163,7 +170,7 @@ public class ServerContral {
                 if(t.equals(uTo)){
                     m.setType(MessHelp.REONETO);//这个是你要接收的数据，即将更新你的窗口=========
                     /*
-                     * * * * * * * * * *用户不在线,新建一个线程循环等待用户上线,则建立临时本本寄存==在线再传递;* * * * * * * * * 
+                     * * * * * * * * * *用户不在线,新建一个线程 循环等待用户上线,则建立临时本本寄存==在线再传递;* * * * * * * * * 
                      */
                     try {
                         allClient.get(t).writeObject(m);
@@ -185,6 +192,45 @@ public class ServerContral {
                 }
             }
  
+        }
+        /*
+         * 处理加好友
+         */
+        private void disposeSearch(){
+            MessageBox m=news;
+            String str=news.getContent();
+            User u=DBOperation.select(str);
+            //if(u!=null){
+                m.setTo(u);//更改to信息
+            //}
+            m.setType(MessHelp.RESEARCH);
+            try {
+                out.writeObject(m);
+                out.flush();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        private void disposeAddFriend(){
+            MessageBox m=news;
+            boolean is=DBOperation.addFriend(m.getFrom(), m.getTo(), m.getContent());
+            MessageBox m2=new MessageBox();
+            m2.setType(MessHelp.READDFRIEND);
+            if(is){
+                m2.setContent("true");
+            }else
+            {
+                m2.setContent("false");
+            }
+            try {
+                out.writeObject(m);
+                out.flush();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            
         }
         
         

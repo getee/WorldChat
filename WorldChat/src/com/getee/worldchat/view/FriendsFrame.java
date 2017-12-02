@@ -19,11 +19,13 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JComboBox;
 import javax.swing.JTextPane;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.text.*;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -44,7 +46,15 @@ import com.getee.worldchat.model.User;
 
 
 
+
+
+
 import javax.swing.JTabbedPane;
+
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
+import javax.swing.JList;
 
 
 public class FriendsFrame extends JFrame{
@@ -52,7 +62,7 @@ public class FriendsFrame extends JFrame{
     private Map<String,OneChatFrame>  allFrames=new HashMap<>();
     //需要打开frame;   接受者解析from  \   发送者解析to
     
-    
+    private AddFriendFrame  addFrame;
     private JTextField textField;
     private JButton btnNewButton;
     private JButton btnNewButton_1;
@@ -66,8 +76,15 @@ public class FriendsFrame extends JFrame{
     private JScrollPane scrollPane;
     private JScrollPane scrollPane_1;
     
+    private JButton addFriendButton;//加好友
+    private JButton addGroupButton;//加群
+    private JList list;
+    
+    public JTree getTree() {
+        return tree;
+    }
     public static void main(String[] args) {
-        User admin =DBOperation.select("3");
+        User admin =DBOperation.select("1");
         new FriendsFrame(admin);
     }
     public FriendsFrame(ObjectOutputStream out,ObjectInputStream in,User user) {
@@ -77,6 +94,7 @@ public class FriendsFrame extends JFrame{
         tree.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                if(user.getFriends().size()==0) return ;
                 if(e.getButton()==1&&e.getClickCount()==2) {
                     TreePath  path=tree.getSelectionPath();
                     DefaultMutableTreeNode lastNode=(DefaultMutableTreeNode)path.getLastPathComponent();
@@ -155,18 +173,27 @@ public class FriendsFrame extends JFrame{
         tong.setImage(tong.getImage().getScaledInstance(116,35,Image.SCALE_DEFAULT));
         btnNewButton = new JButton(tong);
         btnNewButton.setBounds(0, 0, 116, 35);
+        btnNewButton.addActionListener((ActionEvent e)->{
+            tabbedPane.setSelectedIndex(0);
+        });
         panel.add(btnNewButton);
         
         ImageIcon qun = new ImageIcon("source/icon/qun.png");//群聊图标
         qun.setImage(qun.getImage().getScaledInstance(116,35,Image.SCALE_DEFAULT));
         btnNewButton_1 = new JButton(qun);
         btnNewButton_1.setBounds(114, 0, 116, 35);
+        btnNewButton_1.addActionListener((ActionEvent e)->{
+            tabbedPane.setSelectedIndex(1);
+        });
         panel.add(btnNewButton_1);
         
         ImageIcon near = new ImageIcon("source/icon/near.png");//最近图标
         near.setImage(near.getImage().getScaledInstance(116,35,Image.SCALE_DEFAULT));
         btnNewButton_2 = new JButton(near);
         btnNewButton_2.setBounds(228, 0, 104, 35);
+        btnNewButton_2.addActionListener((ActionEvent e)->{
+            tabbedPane.setSelectedIndex(2);
+        });
         panel.add(btnNewButton_2);
         
         tabbedPane = new JTabbedPane(JTabbedPane.TOP);
@@ -180,6 +207,13 @@ public class FriendsFrame extends JFrame{
         scrollPane_1 = new JScrollPane();
         tabbedPane.addTab("New tab", null, scrollPane_1, null);
         
+        String[] strGroup=user.getGroups().toArray(new String[]{});//Set2Array  遍历所有群
+        list = new JList<String>(strGroup);
+        list.setForeground(Color.ORANGE);
+        list.setFont(new Font("华文行楷", Font.PLAIN, 24));
+        
+        scrollPane_1.setViewportView(list);
+        
         JScrollPane scrollPane_2 = new JScrollPane();
         tabbedPane.addTab("New tab", null, scrollPane_2, null);
         
@@ -189,33 +223,63 @@ public class FriendsFrame extends JFrame{
         
         
         DefaultMutableTreeNode  root=new DefaultMutableTreeNode("root");
+        
         //定义一个jtree根节点，所有的好友分组和好友都在这个根节点上往上放
         System.out.println(user);
         Map<String, HashSet<User>>  allFriends=user.getFriends();
          
         Set<String>  allGroupNames=allFriends.keySet();//获取所有的分组名
-        
-        for(String groupName:allGroupNames) {
-            DefaultMutableTreeNode  group=new DefaultMutableTreeNode(groupName);//构造出每个组名的对应的TreeNode对象
-            HashSet<User>  friendsOfGroup=allFriends.get(groupName);
-            for(User u:friendsOfGroup) {
-                DefaultMutableTreeNode  friend=new DefaultMutableTreeNode(u.getNiname()+"  ["+u.getIdNum()+"]");
-                group.add(friend);
+        if(allGroupNames.size()==0){
+            DefaultMutableTreeNode  dmt=new DefaultMutableTreeNode("我的设备");//设置默认分组
+            root.add(dmt);
+
+        }
+        else{
+            for(String groupName:allGroupNames) {
+                DefaultMutableTreeNode  group=new DefaultMutableTreeNode(groupName);//构造出每个组名的对应的TreeNode对象
+                HashSet<User>  friendsOfGroup=allFriends.get(groupName);
+                System.out.println(groupName);
+                for(User u:friendsOfGroup) {
+                    DefaultMutableTreeNode  friend=new DefaultMutableTreeNode(u.getNiname()+"  ["+u.getIdNum()+"]");
+                    group.add(friend);
+                }
+                
+                root.add(group);
             }
-            
-            root.add(group);
         }
 
         tree = new JTree(root);
-        
+
         tree.setRootVisible(false);
         scrollPane.setViewportView(tree);
         
-        ImageIcon add = new ImageIcon("source/icon/add.png");//通讯录图标
-        add.setImage(add.getImage().getScaledInstance(333,44,Image.SCALE_DEFAULT));
-        JButton btnNewButton_3 = new JButton(add);
-        btnNewButton_3.setBounds(0, 639, 333, 44);
-        getContentPane().add(btnNewButton_3);
+        
+        addFriendButton = new JButton("加好友");
+        addFriendButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if(addFrame==null)
+                    addFrame=new AddFriendFrame(out,in,user,FriendsFrame.this);
+                else
+                {
+                    addFrame.setVisible(true);
+                    addFrame.getPanel().setVisible(false);
+                }
+            }
+        });
+        addFriendButton.setBounds(0, 639, 160, 44);
+        getContentPane().add(addFriendButton);
+        
+        addGroupButton = new JButton("加群");
+        addGroupButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            }
+        });
+        addGroupButton.setBounds(158, 639, 174, 44);
+        getContentPane().add(addGroupButton);
+    }
+    
+    public void reUpdata(){//更新界面
+        tree.updateUI();
     }
     /*
      * 只对服务器传递消息进行read处理
@@ -237,6 +301,12 @@ public class FriendsFrame extends JFrame{
                     else if(type==MessHelp.REONETO){//个人接收信息返回
                         processOneTo();
                     }
+                    else if(type==MessHelp.RESEARCH){//个人查找信息返回
+                        processAddFriend();
+                    }else if(type==MessHelp.READDFRIEND){//个人查找信息返回
+                        processReAdd();
+                    }
+
                 } catch (ClassNotFoundException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -295,5 +365,60 @@ public class FriendsFrame extends JFrame{
             }
             
         }
+        private void processAddFriend(){
+          if(news.getTo()==null){
+              JOptionPane.showMessageDialog(addFrame, "用户名不存在!","温馨提示",JOptionPane.ERROR_MESSAGE);
+              return ;
+          }
+          //======================================显示添加的好友信息================================================
+          addFrame.getPanel().setVisible(true);
+          User u=news.getTo();
+          ImageIcon head = new ImageIcon(u.getPhoto());//头像图片
+          head.setImage(head.getImage().getScaledInstance(160,174,Image.SCALE_DEFAULT));
+          addFrame.getLblNewLabel().setIcon(head);
+          addFrame.getTxtpnid().setText("");
+          
+          SimpleAttributeSet attrset = new SimpleAttributeSet();//样式类
+          StyleConstants.setFontSize(attrset,22);//设置字体大小
+          StyleConstants.setForeground(attrset,Color.BLUE);//别人昵称
+          Document docs = addFrame.getTxtpnid().getDocument();//获得文本对象
+          try {
+              docs.insertString(docs.getLength(),u.getNiname()+"\n" , attrset);//对文本进行追加(文本末位处,String,样式)
+          } catch (BadLocationException e) {
+              e.printStackTrace();
+          }
+          StyleConstants.setForeground(attrset,Color.RED);//别人id是颜色 
+          docs = addFrame.getTxtpnid().getDocument();//获得文本对象
+          try {
+              docs.insertString(docs.getLength(),"("+u.getIdNum()+")\n" , attrset);//对文本进行追加(文本末位处,String,样式)
+          } catch (BadLocationException e) {
+              e.printStackTrace();
+          }
+          StyleConstants.setFontSize(attrset,20);//设置字体大小
+          StyleConstants.setForeground(attrset,Color.GRAY);//别人个性签名颜色 
+          docs = addFrame.getTxtpnid().getDocument();//获得文本对象
+          try {
+              docs.insertString(docs.getLength(),""+u.getSpeakword()+"\n" , attrset);//对文本进行追加(文本末位处,String,样式)
+          } catch (BadLocationException e) {
+              e.printStackTrace();
+          }
+          //======================================确认添加好友================================================
+          addFrame.setAddUser(u);
+
+        }
+        private void processReAdd(){
+            String str=news.getContent();
+            if(str.equals("true")){
+                JOptionPane.showMessageDialog(null, "添加成功!","提示",JOptionPane.INFORMATION_MESSAGE);
+            }
+            else{
+                JOptionPane.showMessageDialog(null, "添加失败!","提示",JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
+        
+        
+        
+        
+        
     }
 }
