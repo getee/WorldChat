@@ -179,7 +179,9 @@ public class RegistFrame extends JFrame{
         button.setBounds(254, 417, 231, 55);
         getContentPane().add(button);
         button.addActionListener((ActionEvent e)->{
-            if(!chckbxNewCheckBox.isSelected())
+            if(textField.getText().equals("") || passwordField.getPassword().length==0){
+                JOptionPane.showMessageDialog(RegistFrame.this, "用户信息输入非法!","警告",JOptionPane.ERROR_MESSAGE);
+            }else if(!chckbxNewCheckBox.isSelected())
             {
                 JOptionPane.showMessageDialog(RegistFrame.this, "用户名一旦注册无法更改!","相关条款",JOptionPane.INFORMATION_MESSAGE);
             }

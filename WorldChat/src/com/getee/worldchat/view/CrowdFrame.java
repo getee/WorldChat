@@ -15,6 +15,8 @@ import javax.swing.JButton;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.JLabel;
 
@@ -22,6 +24,8 @@ import java.awt.Color;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import javax.swing.JList;
@@ -30,12 +34,14 @@ import com.getee.worldchat.control.DBGroup;
 import com.getee.worldchat.control.DBOperation;
 import com.getee.worldchat.control.PackMessage;
 import com.getee.worldchat.model.GroupLevel;
+import com.getee.worldchat.model.MessHelp;
 import com.getee.worldchat.model.MessageBox;
 import com.getee.worldchat.model.PictureBath;
 import com.getee.worldchat.model.User;
 
 public class CrowdFrame extends JFrame {
-    private JFrame FriendsFrame;
+
+    private JFrame friendsFrame;
 
     private JPanel contentPane;
     private JTextPane textPane;//对话框
@@ -61,11 +67,37 @@ public class CrowdFrame extends JFrame {
         new CrowdFrame(DBOperation.select("1"),DBGroup.select("666"));
     }
     
-    public CrowdFrame(ObjectOutputStream out,ObjectInputStream in,JFrame FriendsFrame,User myself,User chatGroup) {
+    public CrowdFrame(ObjectOutputStream out,ObjectInputStream in,FriendsFrame friendsFrame,User myself,User chatGroup) {
         this(myself,chatGroup);
         this.in=in;
         this.out=out;
-        this.FriendsFrame=FriendsFrame;
+        this.friendsFrame=friendsFrame;
+        list.addMouseListener(new MouseAdapter() {
+            /*
+             * 在群中进行单个聊天
+             * @see java.awt.event.MouseAdapter#mouseClicked(java.awt.event.MouseEvent)
+             */
+        private Map<String,OneChatFrame>  allFraes=new HashMap<>();//群中个人聊天记录
+            public void mouseClicked(MouseEvent e) {
+                User user=myself;//好友更新后需要再更新
+                if(user.getFriends().size()==0) return ;
+                if(e.getButton()==1&&e.getClickCount()==2) {
+                    User uTo=(User) list.getSelectedValue();
+                    String uID=uTo.getIdNum();
+                        if(friendsFrame.getAllFrames().get(uID)!=null)
+                        {
+                            friendsFrame.getAllFrames().get(uID).setVisible(true);
+                            return;
+                        }
+                    OneChatFrame   chat=new OneChatFrame(out,in,friendsFrame,user,uTo);
+                    //OneChatFrame   chat=new OneChatFrame(FriendsFrame.this.user,chatUser);
+                    chat.setVisible(true);//让聊天界面显示出来
+                    friendsFrame.getAllFrames().put(uID, chat);
+                    
+                    
+                }
+            }
+        });
         
     }
 
@@ -170,7 +202,7 @@ public class CrowdFrame extends JFrame {
         Set<User> suu=chatGroup.getFriends().get(GroupLevel.NOMAL);
         
         System.out.println(suu);
-        User[] strGroup=suu.toArray(new User[]{});//Set2Array  遍历所有群
+        User[] strGroup=suu.toArray(new User[]{});//Set2Array  遍历所有群的好友
         list = new JList<User>(strGroup);
         list.setForeground(Color.ORANGE);
         list.setFont(new Font("华文楷体", Font.PLAIN, 24));

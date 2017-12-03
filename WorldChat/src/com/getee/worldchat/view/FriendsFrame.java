@@ -64,11 +64,19 @@ import javax.swing.JList;
 public class FriendsFrame extends JFrame{
   //为了能记录所有和我聊过天的好友信息(打开过聊天界面的好友信息)，<对方Id号,界面>
     private Map<String,OneChatFrame>  allFrames=new HashMap<>();
+    
+    public Map<String, OneChatFrame> getAllFrames() {
+        return allFrames;
+    }
     //需要打开frame;   接受者解析from  \   发送者解析to
     private Map<String,CrowdFrame>  allGroup=new HashMap<>();
-
     
+    
+    
+    private DefaultMutableTreeNode root;
+
     private AddFriendFrame  addFrame;
+    private AddGroupFrame  addGroupFrame;
     private JTextField textField;
     private JButton btnNewButton;
     private JButton btnNewButton_1;
@@ -78,7 +86,7 @@ public class FriendsFrame extends JFrame{
     
     private ObjectOutputStream out;
     private ObjectInputStream in;
-    private JTabbedPane tabbedPane;
+    private JTabbedPane tabbedPane;//控制面板
     private JScrollPane scrollPane;
     private JScrollPane scrollPane_1;
     
@@ -101,6 +109,7 @@ public class FriendsFrame extends JFrame{
         tree.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                User user=FriendsFrame.this.user;//好友更新后需要再更新
                 if(user.getFriends().size()==0) return ;
                 if(e.getButton()==1&&e.getClickCount()==2) {
                     TreePath  path=tree.getSelectionPath();
@@ -139,6 +148,7 @@ public class FriendsFrame extends JFrame{
         });
         list.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
+                User user=FriendsFrame.this.user;//好友更新后需要再更新
                 if(user.getGroups().size()==0) return ;
                 if(e.getButton()==1&&e.getClickCount()==2) {
                     String groupName=list.getSelectedValue().toString();
@@ -268,7 +278,7 @@ public class FriendsFrame extends JFrame{
         
         //System.out.println("=======================================================================");
 
-        DefaultMutableTreeNode  root=new DefaultMutableTreeNode("root");
+        root=new DefaultMutableTreeNode("root");
         
         //定义一个jtree根节点，所有的好友分组和好友都在这个根节点上往上放
         System.out.println(user);
@@ -348,7 +358,7 @@ public class FriendsFrame extends JFrame{
                     }
                     else if(type==MessHelp.RESEARCH){//个人查找信息返回
                         processAddFriend();
-                    }else if(type==MessHelp.READDFRIEND){//个人查找信息返回
+                    }else if(type==MessHelp.READDFRIEND){//个人查找好友信息返回
                         processReAdd();
                     }
 //                    else if(type==MessHelp.REALLFROM){//个人->群发送信息返回
@@ -359,6 +369,12 @@ public class FriendsFrame extends JFrame{
                     }
                     else if(type==MessHelp.REGROUP){//群->个人接收信息返回
                         processRegroup();
+                    }
+                    else if(type==MessHelp.RELOOKGROUP){//个人添加群的查找
+                        //processLookFriend();//重用显示界面
+                    }
+                    else if(type==MessHelp.READDGROUP){//个人添加群
+                        //processAddGroup();
                     }
 
                 } catch (ClassNotFoundException e) {
@@ -438,7 +454,7 @@ public class FriendsFrame extends JFrame{
           StyleConstants.setForeground(attrset,Color.BLUE);//别人昵称
           Document docs = addFrame.getTxtpnid().getDocument();//获得文本对象
           try {
-              docs.insertString(docs.getLength(),u.getNiname()+"\n" , attrset);//对文本进行追加(文本末位处,String,样式)
+              docs.insertString(docs.getLength(),u.getNiname()+" " , attrset);//对文本进行追加(文本末位处,String,样式)
           } catch (BadLocationException e) {
               e.printStackTrace();
           }
@@ -461,10 +477,37 @@ public class FriendsFrame extends JFrame{
           addFrame.setAddUser(u);
 
         }
-        private void processReAdd(){//交给下级add好友调用
+        private void processReAdd(){//接收到add好友，自身调用
             String str=news.getContent();
             if(str.equals("true")){
                 JOptionPane.showMessageDialog(null, "添加成功!","提示",JOptionPane.INFORMATION_MESSAGE);
+                user=news.getFrom();//刷新user的值
+
+                //实现重绘
+ 
+                SwingUtilities.invokeLater(new Runnable() {  
+                    public void run() { 
+                        root.removeAllChildren();//删除原有的子节点
+                        Map<String, HashSet<User>>  allFriends=user.getFriends();
+                        //root=new DefaultMutableTreeNode("root");
+                        Set<String>  allGroupNames=allFriends.keySet();//获取所有的分组名
+                            for(String groupName:allGroupNames) {
+                                DefaultMutableTreeNode  group=new DefaultMutableTreeNode(groupName);//构造出每个组名的对应的TreeNode对象
+                                HashSet<User>  friendsOfGroup=allFriends.get(groupName);
+                                for(User u:friendsOfGroup) {
+                                    DefaultMutableTreeNode  friend=new DefaultMutableTreeNode(u.getNiname()+"  ["+u.getIdNum()+"]");
+                                    group.add(friend);
+                                }
+                                
+                                root.add(group);
+                            }
+                            tree.updateUI();                   
+                    }  
+                });
+                
+                
+
+                
             }
             else{
                 JOptionPane.showMessageDialog(null, "添加失败!","提示",JOptionPane.INFORMATION_MESSAGE);

@@ -26,7 +26,7 @@ import com.getee.worldchat.model.User;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 
-public class AddFriendFrame extends JFrame {
+public class AddGroupFrame extends JFrame {
 
     private JPanel contentPane;
     private JPanel panel ;//查找面板
@@ -52,7 +52,7 @@ public class AddFriendFrame extends JFrame {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    new AddFriendFrame();
+                    new AddGroupFrame();
                     
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -61,7 +61,7 @@ public class AddFriendFrame extends JFrame {
         });
     }
     
-    public AddFriendFrame(ObjectOutputStream out,ObjectInputStream in,User user,FriendsFrame ff) {
+    public AddGroupFrame(ObjectOutputStream out,ObjectInputStream in,User user,FriendsFrame ff) {
         this();
         this.out=out;
         this.in=in;
@@ -72,7 +72,7 @@ public class AddFriendFrame extends JFrame {
     /**
      * Create the frame.
      */
-    public AddFriendFrame() {
+    public AddGroupFrame() {
         this.setVisible(true);
         //setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 592, 374);
@@ -114,13 +114,13 @@ public class AddFriendFrame extends JFrame {
         //lblNewLabel.setVisible(false);
         panel.add(lblNewLabel);
         
-        btnNewButton = new JButton("+好友");
+        btnNewButton = new JButton("+群");
         btnNewButton.setBounds(241, 127, 114, 62);
         //btnNewButton.setVisible(false);
         panel.add(btnNewButton);
         btnNewButton.addActionListener((ActionEvent e)->{
-            String groupName=JOptionPane.showInputDialog(AddFriendFrame.this,"请输入分组名:\n","title",JOptionPane.PLAIN_MESSAGE);
-            sendAdd(groupName);
+            //String groupName=JOptionPane.showInputDialog(AddGroupFrame.this,"请输入分组名:\n","title",JOptionPane.PLAIN_MESSAGE);
+            sendAdd();
             
         });
         
@@ -128,7 +128,7 @@ public class AddFriendFrame extends JFrame {
         btnNewButton_1.setBounds(370, 127, 101, 62);
         //btnNewButton_1.setVisible(false);
         btnNewButton_1.addActionListener((ActionEvent e)->{
-               AddFriendFrame.this.setVisible(false);
+               AddGroupFrame.this.setVisible(false);
         });
         panel.add(btnNewButton_1);
         
@@ -138,13 +138,12 @@ public class AddFriendFrame extends JFrame {
         txtpnid.setBounds(241, 15, 229, 105);
         panel.add(txtpnid);
     }
-    public void sendAdd(String str){
-        if(str!=null){
+    public void sendAdd(){
+
             MessageBox m=new MessageBox();
             m.setFrom(user);
             m.setTo(addUser);
-            m.setType(MessHelp.ADDFRIEND);
-            m.setContent(str);//内容为群名
+            m.setType(MessHelp.ADDGROUP);
             try {
                 out.writeObject(m);
                 out.flush();
@@ -152,12 +151,11 @@ public class AddFriendFrame extends JFrame {
                   // TODO Auto-generated catch block
                   e.printStackTrace();
               }
-        }
     }
     public void searchFriend(String str){
         MessageBox m=new MessageBox();
         m.setContent(str);
-        m.setType(MessHelp.SEARCH);
+        m.setType(MessHelp.LOOKGROUP);
         m.setFrom(user);
         try {
             out.writeObject(m);

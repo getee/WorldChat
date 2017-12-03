@@ -88,7 +88,15 @@ public class ServerContral {
                     }
                     else if(type==MessHelp.SELECTGROUP)
                     {
-                        disposeSelectGroup();
+                        disposeSelectGroup(); 
+                    }
+                    else if(type==MessHelp.LOOKGROUP)
+                    {
+                        disposeLookGroup(); 
+                    }
+                    else if(type==MessHelp.ADDGROUP)
+                    {
+                        //disposeAddGroup(); 
                     }
                     //。。。
                     
@@ -295,6 +303,7 @@ public class ServerContral {
             boolean is=DBOperation.addFriend(m.getFrom(), m.getTo(), m.getContent());
             MessageBox m2=new MessageBox();
             m2.setType(MessHelp.READDFRIEND);
+            m2.setFrom(DBOperation.select(m.getFrom().getIdNum()));//添加好友，并放回新的好友值
             if(is){
                 m2.setContent("true");
             }else
@@ -302,7 +311,7 @@ public class ServerContral {
                 m2.setContent("false");
             }
             try {
-                out.writeObject(m);
+                out.writeObject(m2);
                 out.flush();
             } catch (IOException e) {
                 // TODO Auto-generated catch block
@@ -376,6 +385,18 @@ public class ServerContral {
             MessageBox m=news;
             m.setTo(DBGroup.select(m.getContent()));
             m.setType(MessHelp.REGROUP);
+            try {
+                out.writeObject(m);
+                out.flush();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        private void disposeLookGroup(){
+            MessageBox m=news;
+            m.setTo(DBGroup.select(m.getContent()));
+            m.setType(MessHelp.RELOOKGROUP);
             try {
                 out.writeObject(m);
                 out.flush();

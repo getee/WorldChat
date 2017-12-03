@@ -29,7 +29,7 @@ public class DBGroup {
 //        group.setPhoto("source/头像4.jpg");
 //        group.setSpeakword("悔罪净化灵魂， 劳动重塑自我！");
 //        edit(group);
-//        User u=DBOperation.select("2");
+//        User u=DBOperation.select("1");
 //        System.out.println(addGroup(u, "666"));
 
 
